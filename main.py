@@ -1,12 +1,10 @@
-from PySide6 import QtWidgets
-from PySide6 import QtGui
-from PySide6 import QtCore
-import sys
 import json
 import logging
 import pprint
+import sys
 from importlib import util
 
+from PySide6 import QtCore, QtGui, QtWidgets
 
 # 初始化配置
 logging.basicConfig(
@@ -62,7 +60,7 @@ class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(config["name"])
-        self.setWindowIcon(QtGui.QIcon(f"./data/{setting["desktopPet"]}/res/icon.gif"))
+        self.setWindowIcon(QtGui.QIcon(f"./data/{setting['desktopPet']}/res/icon.gif"))
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
             | QtCore.Qt.WindowType.FramelessWindowHint
@@ -150,9 +148,9 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config["acc"][0]
                 and abs(self.state["motion"][1]) <= config["acc"][1]
             ):
-                self.loadMovie(f"./data/{setting["desktopPet"]}/res/basic/stand.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/stand.gif")
             else:
-                self.loadMovie(f"./data/{setting["desktopPet"]}/res/basic/drop.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/drop.gif")
 
         for i in self.state["update"]:
             try:
@@ -255,19 +253,18 @@ class Window(QtWidgets.QWidget):
         def about():
             QtWidgets.QMessageBox.about(
                 self,
-                f"关于{config["name"]}",
-                f"桌宠名字: {config["name"]}\n版本号: v{config["version"]}\n作者: {config["author"]}",
+                f"关于{config['name']}",
+                f"桌宠名字: {config['name']}\n版本号: v{config['version']}\n作者: {config['author']}",
             )
 
         menuDict = {
             "退出": {"__type__": "command", "__func__": self.close},
-            f"关于{config["name"]}": {"__type__": "command", "__func__": about},
+            f"关于{config['name']}": {"__type__": "command", "__func__": about},
         }
         createLog("已创建基础右键菜单")
 
         # 导入插件
         for plugin in pluginList:
-
             menuDict[plugin.pluginName] = {"__type__": "menu"}
             for displayName, entry in plugin.menu.items():
 
@@ -283,7 +280,7 @@ class Window(QtWidgets.QWidget):
                             )
                         except Exception as error:
                             createLog(
-                                f"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, "create")} 功能错误:{error}",
+                                f"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, 'create')} 功能错误:{error}",
                                 3,
                             )
 
@@ -318,18 +315,18 @@ class Window(QtWidgets.QWidget):
             }
         menu = menuGenerate(self, menuDict)
         menu.exec(globalPos)
-        createLog(f"{setting["desktopPet"]}:{config["name"]} 桌宠右键菜单已显示")
+        createLog(f"{setting['desktopPet']}:{config['name']} 桌宠右键菜单已显示")
 
 
 # 导入数据
 setting = json.load(open("./setting.json", encoding="utf-8"))
 for key in ["desktopPet", "debug"]:
-    if not key in setting:
+    if key not in setting:
         logging.error(f"setting.json 文件没有 {key} 键!")
         exit()
 
 config = json.load(
-    open(f"./data/{setting["desktopPet"]}/config.json", encoding="utf-8")
+    open(f"./data/{setting['desktopPet']}/config.json", encoding="utf-8")
 )
 for key in [
     "name",
@@ -339,7 +336,7 @@ for key in [
     "fri",
     "plugin",
 ]:
-    if not key in config:
+    if key not in config:
         logging.error(f"config.json 文件没有 {key} 键!")
         exit()
 
@@ -347,12 +344,13 @@ pluginList = []
 if "plugin" in config:
     for path in config["plugin"]:
         spec = util.spec_from_file_location(
-            "plugin", f"./data/{setting["desktopPet"]}/plugin/{path}/main.py"
+            "plugin", f"./data/{setting['desktopPet']}/plugin/{path}/main.py"
         )
-        plugin = util.module_from_spec(spec)
-        sys.modules["plugin"] = plugin
-        spec.loader.exec_module(plugin)
-        pluginList.append(plugin)
+        if spec and spec.loader:
+            plugin = util.module_from_spec(spec)
+            sys.modules["plugin"] = plugin
+            spec.loader.exec_module(plugin)
+            pluginList.append(plugin)
 
 app = QtWidgets.QApplication(sys.argv)
 
