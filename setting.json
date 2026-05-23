@@ -1,4 +1,5 @@
 {
     "desktopPet": "Template",
-    "debug": true
+    "debug": true,
+    "language": "zh-cn"
 }
