@@ -1,14 +1,13 @@
-from PySide6 import QtWidgets
-from PySide6 import QtGui
-from PySide6 import QtCore
-import sys
 import json
 import logging
 import pprint
+import sys
 from importlib import util
 
+from PySide6 import QtCore, QtGui, QtWidgets
 
 # 初始化配置
+# Initialize Configuration
 logging.basicConfig(
     filename="./last.log",
     encoding="utf-8",
@@ -18,6 +17,7 @@ logging.basicConfig(
 
 
 # 创建菜单工具
+# Create Menu Tool
 def menuGenerate(master: QtWidgets.QWidget, structure: dict):
     menu = QtWidgets.QMenu(master)
 
@@ -43,32 +43,57 @@ def menuGenerate(master: QtWidgets.QWidget, structure: dict):
 
 
 # 日志工具
-def createLog(msg: str, level: int = 1):
-    if setting["debug"]:
+# Log tool
+def createLog(msg: str, level: int = 1, debug: bool = False):
+    if debug:
         if level == 0:
             logging.debug(msg)
-        elif level == 1:
+        if level == 1:
             logging.info(msg)
-        elif level == 2:
-            logging.warning(msg)
-        elif level == 3:
-            logging.error(msg)
-        elif level == 4:
-            logging.critical(msg)
+    if level == 2:
+        logging.warning(msg)
+    if level == 3:
+        logging.error(msg)
+    if level == 4:
+        logging.critical(msg)
+
+
+# 语言服务
+# Language services
+class Translate:
+    def __init__(self, tran: dict[str, dict[str, str]], lang="en-us"):
+        self.lang = lang
+        self.tran = tran
+
+    def run(self, key: str, fallback: str | None = None) -> str:
+        if key in self.tran:
+            if self.lang in self.tran[key]:
+                return self.tran[key][self.lang]
+            elif "en-us" in self.tran[key]:
+                return self.tran[key]["en-us"]
+            elif fallback is not None:
+                return fallback
+            else:
+                return f'TRANSLATE ERROR: not found "{self.lang}" language and not found "en-us"'
+        elif fallback is not None:
+            return fallback
+        else:
+            return f'TRANSLATE ERROR: not found "{key}"'
 
 
 # 定义窗口
+# Define Window
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(config["name"])
-        self.setWindowIcon(QtGui.QIcon(f"./data/{setting["desktopPet"]}/res/icon.gif"))
+        self.setWindowIcon(QtGui.QIcon(f"./data/{setting['desktopPet']}/res/icon.gif"))
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
             | QtCore.Qt.WindowType.FramelessWindowHint
         )
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        createLog("窗口初始化完毕")
+        createLog(tran.run("window.complete"), debug=setting["debug"])
 
         self.nowMousePos = [0, 0]
         self.lastMousePos = [0, 0]
@@ -102,39 +127,46 @@ class Window(QtWidgets.QWidget):
             "screenHeight": screenHeight,
             "update": [],
         }
-        createLog("参数配置完毕")
+        createLog(tran.run("program.ready"), debug=setting["debug"])
 
         # 自启动判断
-        _ = []
+        # Autostart judgment
+        autostartFunctions = []
         for plugin in pluginList:
             for displayName, entry in plugin.menu.items():
 
                 def itemFunc(f=entry):
-                    def _():
-                        getattr(f, "enter")(
-                            self.image,
-                            self.mainTimer,
-                            self.physicsTimer,
-                            self.state,
-                            self,
-                        )
-
-                    return _
+                    return lambda: getattr(f, "enter")(
+                        self.image,
+                        self.mainTimer,
+                        self.physicsTimer,
+                        self.state,
+                        self,
+                    )
 
                 if getattr(entry, "__autoStart__"):
-                    _.append(itemFunc())
+                    autostartFunctions.append(itemFunc())
                     createLog(
-                        f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加置自启动"
+                        eval(tran.run("program.plugin.autostart.add")),
+                        debug=setting["debug"],
                     )
-        for i in _:
+        for func in autostartFunctions:
             try:
-                i()
-                createLog(f"{i} 自启动函数已运行")
-            except Exception as error:
-                createLog(f"{i} 自启动函数运行错误:{error}", 3)
+                func()
+                createLog(
+                    eval(tran.run("program.plugin.autostart.run")),
+                    debug=setting["debug"],
+                )
+            except Exception as error:  # noqa: F841
+                createLog(
+                    eval(tran.run("program.plugin.autostart.runError")),
+                    3,
+                    debug=setting["debug"],
+                )
 
     def loadMovie(self, path: str):
         # 加载动画
+        # Loading animation
         if self.image.fileName() != path:
             self.image.setFileName(path)
             self.image.jumpToFrame(0)
@@ -142,6 +174,7 @@ class Window(QtWidgets.QWidget):
 
     def mainStep(self):
         # 主时钟循环
+        # Main clock loop
         self.pause = self.state["pause"]
         self.motion = self.state["motion"]
         self.position = self.state["position"]
@@ -150,26 +183,33 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config["acc"][0]
                 and abs(self.state["motion"][1]) <= config["acc"][1]
             ):
-                self.loadMovie(f"./data/{setting["desktopPet"]}/res/basic/stand.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/stand.gif")
             else:
-                self.loadMovie(f"./data/{setting["desktopPet"]}/res/basic/drop.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/drop.gif")
 
-        for i in self.state["update"]:
+        for func in self.state["update"]:
             try:
-                i()
-            except Exception as error:
-                createLog(f"{i} 循环函数运行错误:{error}", 3)
+                func()
+            except Exception as error:  # noqa: F841
+                createLog(
+                    eval(tran.run("program.plugin.loopFunction.runError")),
+                    3,
+                    debug=setting["debug"],
+                )
 
         self.desktopPet.move(self.state["position"][0], self.state["position"][1])
 
     def physicsStep(self):
         # 物理时钟循环
+        # Physical clock cycle
 
         # 重力模拟
+        # Gravity simulation
         self.state["motion"][0] += config["acc"][0]
         self.state["motion"][1] += config["acc"][1]
 
         # 速度预处理
+        # Speed preprocessing
         if self.state["motion"][0] > screenWidth - (self.state["position"][0] + 128):
             self.state["motion"][0] = (-self.state["motion"][0]) * (
                 config["ela"][1] / 100
@@ -192,6 +232,7 @@ class Window(QtWidgets.QWidget):
             self.state["position"][1] = 0
 
         # 摩擦力
+        # Friction
         if (
             self.state["position"][0] == 0
             or self.state["position"][0] == screenWidth - 128
@@ -214,6 +255,7 @@ class Window(QtWidgets.QWidget):
                 )
 
         # 设置位置
+        # Set position
         self.state["position"][0] += self.state["motion"][0]
         self.state["position"][1] += self.state["motion"][1]
 
@@ -252,22 +294,25 @@ class Window(QtWidgets.QWidget):
 
     def showMenu(self, globalPos):
         # 右键菜单
-        def about():
-            QtWidgets.QMessageBox.about(
-                self,
-                f"关于{config["name"]}",
-                f"桌宠名字: {config["name"]}\n版本号: v{config["version"]}\n作者: {config["author"]}",
-            )
-
+        # Right-click menu
         menuDict = {
-            "退出": {"__type__": "command", "__func__": self.close},
-            f"关于{config["name"]}": {"__type__": "command", "__func__": about},
+            tran.run("program.menu.exit"): {
+                "__type__": "command",
+                "__func__": self.close,
+            },
+            eval(tran.run("program.menu.about.title")): {
+                "__type__": "command",
+                "__func__": lambda: QtWidgets.QMessageBox.about(
+                    self,
+                    eval(tran.run("program.menu.about.title")),
+                    eval(tran.run("program.menu.about.text")),
+                ),
+            },
         }
-        createLog("已创建基础右键菜单")
+        createLog(tran.run("program.menu.complete"), debug=setting["debug"])
 
         # 导入插件
         for plugin in pluginList:
-
             menuDict[plugin.pluginName] = {"__type__": "menu"}
             for displayName, entry in plugin.menu.items():
 
@@ -281,10 +326,11 @@ class Window(QtWidgets.QWidget):
                                 self.state,
                                 self,
                             )
-                        except Exception as error:
+                        except Exception as error:  # noqa: F841
                             createLog(
-                                f"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, "create")} 功能错误:{error}",
+                                eval(tran.run("program.plugin.function.runError")),
                                 3,
+                                debug=setting["debug"],
                             )
 
                     return _
@@ -293,43 +339,51 @@ class Window(QtWidgets.QWidget):
                     "__type__": "command",
                     "__func__": itemFunc(),
                 }
-                createLog(f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加")
+                createLog(
+                    eval(tran.run("program.plugin.function.add")),
+                    debug=setting["debug"],
+                )
 
         if setting["debug"]:
             if self.showBox:
-                menuDict["开/关碰撞箱"] = {
+                menuDict[tran.run("program.menu.collisionBox")] = {
                     "__type__": "command",
                     "__func__": lambda: self.desktopPet.setStyleSheet(""),
                 }
                 self.showBox = False
             else:
-                menuDict["开/关碰撞箱"] = {
+                menuDict[tran.run("program.menu.collisionBox")] = {
                     "__type__": "command",
                     "__func__": lambda: self.desktopPet.setStyleSheet(
                         "border: 1px solid yellow;"
                     ),
                 }
                 self.showBox = True
-            menuDict["输出所有参数"] = {
+            menuDict[tran.run("program.menu.outputParameter")] = {
                 "__type__": "command",
                 "__func__": lambda: createLog(
-                    "\n" + pprint.pformat(globals(), 2, sort_dicts=False)
+                    "\n" + pprint.pformat(globals(), 2, sort_dicts=False),
+                    debug=setting["debug"],
                 ),
             }
         menu = menuGenerate(self, menuDict)
         menu.exec(globalPos)
-        createLog(f"{setting["desktopPet"]}:{config["name"]} 桌宠右键菜单已显示")
+        createLog(
+            eval(tran.run("program.menu.show")),
+            debug=setting["debug"],
+        )
 
 
 # 导入数据
+# Import Data
 setting = json.load(open("./setting.json", encoding="utf-8"))
 for key in ["desktopPet", "debug"]:
-    if not key in setting:
-        logging.error(f"setting.json 文件没有 {key} 键!")
+    if key not in setting:
+        logging.error(f"The setting.json file does not have the {key} key")
         exit()
 
 config = json.load(
-    open(f"./data/{setting["desktopPet"]}/config.json", encoding="utf-8")
+    open(f"./data/{setting['desktopPet']}/config.json", encoding="utf-8")
 )
 for key in [
     "name",
@@ -339,20 +393,79 @@ for key in [
     "fri",
     "plugin",
 ]:
-    if not key in config:
-        logging.error(f"config.json 文件没有 {key} 键!")
+    if key not in config:
+        logging.error(f"The config.json file does not have the {key} key")
         exit()
+
+# 语言表
+# Language map
+TRAN = {
+    "window.complete": {
+        "en-us": "Window initialization complete",
+        "zh-cn": "窗口初始化完毕",
+    },
+    "program.ready": {"en-us": "Program is ready", "zh-cn": "程序已准备完毕"},
+    "program.plugin.autostart.add": {
+        "en-us": "f\"The {displayName} feature of the 'Desktop-pet {plugin.pluginName}' plugin has been set to auto-start.\"",
+        "zh-cn": 'f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加置自启动"',
+    },
+    "program.plugin.autostart.run": {
+        "en-us": 'f"{func} auto-start function has run"',
+        "zh-cn": 'f"{func} 自启动函数已运行"',
+    },
+    "program.plugin.autostart.runError": {
+        "en-us": 'f"{func} auto-start function run error: {error}"',
+        "zh-cn": 'f"{func} 自启动函数运行错误:{error}"',
+    },
+    "program.plugin.loopFunction.runError": {
+        "en-us": 'f"{func} loop function run error: {error}"',
+        "zh-cn": 'f"{func} 循环函数运行错误:{error}"',
+    },
+    "program.menu.exit": {"en-us": "Exit", "zh-cn": "退出"},
+    "program.menu.about.title": {
+        "en-us": "f\"About {config['name']}\"",
+        "zh-cn": "f\"关于{config['name']}\"",
+    },
+    "program.menu.about.text": {
+        "en-us": "f\"Desktop pet name: {config['name']}\nVersion: v{config['version']}\nAuthor: {config['author']}\"",
+        "zh-cn": "f\"桌宠名字: {config['name']}\n版本号: v{config['version']}\n作者: {config['author']}\"",
+    },
+    "program.menu.complete": {
+        "en-us": "Basic context menu created",
+        "zh-cn": "已创建基础右键菜单",
+    },
+    "program.plugin.function.runError": {
+        "en-us": "f\"Desktop pet {plugin.pluginName} plugin's {displayName}:{getattr(f, 'create')} function error:{error}\"",
+        "zh-cn": "f\"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, 'create')} 功能错误:{error}\"",
+    },
+    "program.plugin.function.add": {
+        "en-us": "f\"The {displayName} feature of the 'Desktop-pet {plugin.pluginName}' plugin has been added\"",
+        "zh-cn": 'f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加"',
+    },
+    "program.menu.collisionBox": {"en-us": "Collision box", "zh-cn": "碰撞箱"},
+    "program.menu.outputParameter": {
+        "en-us": "Output all parameters",
+        "zh-cn": "输出所有参数",
+    },
+    "program.menu.show": {
+        "en-us": "f\"{setting['desktopPet']}:{config['name']} desktop pet right-click menu is displayed\"",
+        "zh-cn": "f\"{setting['desktopPet']}:{config['name']} 桌宠右键菜单已显示\"",
+    },
+}
+
+tran = Translate(TRAN, setting["language"])
 
 pluginList = []
 if "plugin" in config:
     for path in config["plugin"]:
         spec = util.spec_from_file_location(
-            "plugin", f"./data/{setting["desktopPet"]}/plugin/{path}/main.py"
+            "plugin", f"./data/{setting['desktopPet']}/plugin/{path}/main.py"
         )
-        plugin = util.module_from_spec(spec)
-        sys.modules["plugin"] = plugin
-        spec.loader.exec_module(plugin)
-        pluginList.append(plugin)
+        if spec and spec.loader:
+            plugin = util.module_from_spec(spec)
+            sys.modules["plugin"] = plugin
+            spec.loader.exec_module(plugin)
+            pluginList.append(plugin)
 
 app = QtWidgets.QApplication(sys.argv)
 

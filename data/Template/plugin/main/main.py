@@ -1,7 +1,9 @@
-from PySide6 import QtWidgets, QtGui, QtCore
+import logging
 import os
 
-pluginName = "模板"
+from PySide6 import QtCore, QtGui, QtWidgets
+
+pluginName = "Template"
 
 IMAGE = QtGui.QMovie
 TIMER = QtCore.QTimer
@@ -26,18 +28,17 @@ class Template:
         """
         这是用来创建插件的模板
         发挥你的想象力！
+        This is a template for creating plugins.
+        Use your imagination!
         """
-        self.image = image
+        self.__image__ = image
 
     def loadMovie(self, path: str):
         # 加载动画
-        if self.image.fileName() != path:
-            self.image.setFileName(path)
-            self.image.jumpToFrame(0)
-        self.image.start()
-
-
-import logging
+        if self.__image__.fileName() != path:
+            self.__image__.setFileName(path)
+            self.__image__.jumpToFrame(0)
+        self.__image__.start()
 
 
 class Test(Template):
@@ -50,4 +51,4 @@ class Test(Template):
         QtWidgets.QMessageBox.information(window, "TEST", "Hello My DesktopPet!")
 
 
-menu = {"模板": Test()}
+menu = {"Template": Test()}
