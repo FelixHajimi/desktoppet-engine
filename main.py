@@ -183,9 +183,9 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config["acc"][0]
                 and abs(self.state["motion"][1]) <= config["acc"][1]
             ):
-                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/stand.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/stand.gif")
             else:
-                self.loadMovie(f"./data/{setting['desktopPet']}/res/basic/drop.gif")
+                self.loadMovie(f"./data/{setting['desktopPet']}/res/drop.gif")
 
         for func in self.state["update"]:
             try:
@@ -202,6 +202,8 @@ class Window(QtWidgets.QWidget):
     def physicsStep(self):
         # 物理时钟循环
         # Physical clock cycle
+        config["ela"] = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config["ela"]
+        config["fri"] = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config["fri"]
 
         # 重力模拟
         # Gravity simulation
@@ -212,46 +214,50 @@ class Window(QtWidgets.QWidget):
         # Speed preprocessing
         if self.state["motion"][0] > screenWidth - (self.state["position"][0] + 128):
             self.state["motion"][0] = (-self.state["motion"][0]) * (
-                config["ela"][1] / 100
+                config["ela"]["right"] / 100
             )
             self.state["position"][0] = screenWidth - 128
         elif -self.state["motion"][0] > self.state["position"][0]:
             self.state["motion"][0] = (-self.state["motion"][0]) * (
-                config["ela"][1] / 100
+                config["ela"]["left"] / 100
             )
             self.state["position"][0] = 0
         elif self.state["motion"][1] > screenHeight - (self.state["position"][1] + 128):
             self.state["motion"][1] = (-self.state["motion"][1]) * (
-                config["ela"][0] / 100
+                config["ela"]["bottom"] / 100
             )
             self.state["position"][1] = screenHeight - 128
         elif -self.state["motion"][1] > self.state["position"][1]:
             self.state["motion"][1] = (-self.state["motion"][1]) * (
-                config["ela"][0] / 100
+                config["ela"]["top"] / 100
             )
             self.state["position"][1] = 0
 
         # 摩擦力
         # Friction
-        if (
-            self.state["position"][0] == 0
-            or self.state["position"][0] == screenWidth - 128
-        ):
-            if abs(self.state["motion"][1]) < config["fri"][1]:
-                self.state["motion"][1] = 0
+        if self.state["position"][0] == 0:
+            if abs(self.motion[1]) < config["fri"]["left"]:
+                self.motion[1] = 0
             else:
-                self.state["motion"][1] += config["fri"][1] * (
-                    (-1) ** (self.state["motion"][1] > 0)
+                self.motion[1] += config["fri"]["left"] * ((-1) ** (self.motion[1] > 0))
+        elif self.state["position"][0] == screenWidth - 128:
+            if abs(self.motion[1]) < config["fri"]["right"]:
+                self.motion[1] = 0
+            else:
+                self.motion[1] += config["fri"]["right"] * (
+                    (-1) ** (self.motion[1] > 0)
                 )
-        elif (
-            self.state["position"][1] == 0
-            or self.state["position"][1] == screenHeight - 128
-        ):
-            if abs(self.state["motion"][0]) < config["fri"][0]:
-                self.state["motion"][0] = 0
+        if self.state["position"][1] == 0:
+            if abs(self.motion[0]) < config["fri"]["top"]:
+                self.motion[0] = 0
             else:
-                self.state["motion"][0] += config["fri"][0] * (
-                    (-1) ** (self.state["motion"][0] > 0)
+                self.motion[0] += config["fri"]["top"] * ((-1) ** (self.motion[0] > 0))
+        elif self.state["position"][1] == screenHeight - 128:
+            if abs(self.motion[0]) < config["fri"]["bottom"]:
+                self.motion[0] = 0
+            else:
+                self.motion[0] += config["fri"]["bottom"] * (
+                    (-1) ** (self.motion[0] > 0)
                 )
 
         # 设置位置
@@ -355,7 +361,7 @@ class Window(QtWidgets.QWidget):
                 menuDict[tran.run("program.menu.collisionBox")] = {
                     "__type__": "command",
                     "__func__": lambda: self.desktopPet.setStyleSheet(
-                        "border: 1px solid yellow;"
+                        "border: 1px solid red;"
                     ),
                 }
                 self.showBox = True
@@ -427,8 +433,8 @@ TRAN = {
         "zh-cn": "f\"关于{config['name']}\"",
     },
     "program.menu.about.text": {
-        "en-us": "f\"Desktop pet name: {config['name']}\nVersion: v{config['version']}\nAuthor: {config['author']}\"",
-        "zh-cn": "f\"桌宠名字: {config['name']}\n版本号: v{config['version']}\n作者: {config['author']}\"",
+        "en-us": "f\"Desktop pet name: {config['name']}\\nVersion: v{config['version']}\\nAuthor: {config['author']}\"",
+        "zh-cn": "f\"桌宠名字: {config['name']}\\n版本号: v{config['version']}\\n作者: {config['author']}\"",
     },
     "program.menu.complete": {
         "en-us": "Basic context menu created",
@@ -459,7 +465,7 @@ pluginList = []
 if "plugin" in config:
     for path in config["plugin"]:
         spec = util.spec_from_file_location(
-            "plugin", f"./data/{setting['desktopPet']}/plugin/{path}/main.py"
+            "plugin", f"./data/{setting['desktopPet']}/plugin/{path}/enter.py"
         )
         if spec and spec.loader:
             plugin = util.module_from_spec(spec)
