@@ -1,4 +1,7 @@
 # DesktopPet-Engine
+[![GitHub Repo stars](https://img.shields.io/github/stars/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
+[![GitHub forks](https://img.shields.io/github/forks/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 A lightweight desktop pet loading engine that supports physics simulation, plugin extensions, internationalization, and logging. It brings any character to life on your desktop.
 
 <!--## Demo Video
