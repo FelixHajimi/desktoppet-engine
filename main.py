@@ -2,20 +2,10 @@ import json
 import logging
 import pprint
 import sys
+from dataclasses import dataclass, field
 from importlib import util
 
 from PySide6 import QtCore, QtGui, QtWidgets
-
-import languageMap
-
-# 初始化配置
-# Initialize Configuration
-logging.basicConfig(
-    filename="./last.log",
-    encoding="utf-8",
-    level=logging.DEBUG,
-    format="[%(levelname)s] <%(pathname)s> (%(asctime)s) - %(message)s",
-)
 
 
 # 创建菜单工具
@@ -83,23 +73,52 @@ class Translate:
             return f'TRANSLATE ERROR: not found "{key}"'
 
 
+# 配置类
+# Configuration Class
+@dataclass
+class Setting:
+    desktopPet: str
+    dataDir: str
+    desktoppetResourceDir: str
+    pluginFileName: str
+    pluginObjectEntry: str
+    imageSize: list[int]
+    language: str = "en-us"
+    debug: bool = False
+    logPath: str = "./last.log"
+
+
+@dataclass
+class DesktopPetConfig:
+    name: str
+    version: str
+    author: str
+    acc: list[float]
+    fri: dict
+    ela: dict
+    plugin: list[str] = field(default_factory=list)
+
+
 # 定义窗口
 # Define Window
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(config["name"])
-        self.setWindowIcon(QtGui.QIcon(f"./data/{setting['desktopPet']}/res/icon.gif"))
+        self.setWindowTitle(config.name)
+        self.setWindowIcon(
+            QtGui.QIcon(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif")
+        )
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
             | QtCore.Qt.WindowType.FramelessWindowHint
         )
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        createLog(tran.run("window.complete"), debug=setting["debug"])
+        createLog(tran.run("window.complete"), debug=setting.debug)
 
+        self.W, self.H = setting.imageSize
         self.nowMousePos = [0, 0]
         self.lastMousePos = [0, 0]
-        self.position = [(screenWidth - 128) // 2, screenHeight - 128]
+        self.position = [(screenWidth - self.W) // 2, screenHeight - self.H]
         self.motion = [0, 0]
         self.pause = False
         self.showBox = False
@@ -113,13 +132,15 @@ class Window(QtWidgets.QWidget):
         self.physicsTimer.start(20)
 
         self.desktopPet = QtWidgets.QLabel(self)
+        self.desktopPet.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.desktopPet.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
         self.desktopPet.mousePressEvent = self.MousePressEvent
         self.desktopPet.mouseMoveEvent = self.MouseMoveEvent
         self.desktopPet.mouseReleaseEvent = self.MouseReleaseEvent
         self.image = QtGui.QMovie()
+        self.image.setScaledSize(QtCore.QSize(self.W, self.H))
         self.desktopPet.setMovie(self.image)
-        self.desktopPet.resize(128, 128)
+        self.desktopPet.resize(self.W, self.H)
 
         self.state = {
             "pause": False,
@@ -129,7 +150,7 @@ class Window(QtWidgets.QWidget):
             "screenHeight": screenHeight,
             "update": dict(),
         }
-        createLog(tran.run("program.ready"), debug=setting["debug"])
+        createLog(tran.run("program.ready"), debug=setting.debug)
 
         # 自启动判断
         # Autostart judgment
@@ -138,7 +159,7 @@ class Window(QtWidgets.QWidget):
             for _displayName, entry in plugin.menu.items():
 
                 def itemFunc(f=entry):
-                    return lambda: getattr(f, "enter")(
+                    return lambda: getattr(f, setting.pluginObjectEntry)(
                         self.image,
                         self.mainTimer,
                         self.physicsTimer,
@@ -150,20 +171,20 @@ class Window(QtWidgets.QWidget):
                     autostartFunctions.append(itemFunc())
                     createLog(
                         eval(tran.run("program.plugin.autostart.add")),
-                        debug=setting["debug"],
+                        debug=setting.debug,
                     )
         for func in autostartFunctions:
             try:
                 func()
                 createLog(
                     eval(tran.run("program.plugin.autostart.run")),
-                    debug=setting["debug"],
+                    debug=setting.debug,
                 )
             except Exception as error:  # noqa: F841
                 createLog(
                     eval(tran.run("program.plugin.autostart.runError")),
                     3,
-                    debug=setting["debug"],
+                    debug=setting.debug,
                 )
 
     def loadMovie(self, path: str):
@@ -182,12 +203,12 @@ class Window(QtWidgets.QWidget):
         self.position = self.state["position"]
         if not self.pause:
             if (
-                abs(self.state["motion"][0]) <= config["acc"][0]
-                and abs(self.state["motion"][1]) <= config["acc"][1]
+                abs(self.state["motion"][0]) <= config.acc[0]
+                and abs(self.state["motion"][1]) <= config.acc[1]
             ):
-                self.loadMovie(f"./data/{setting['desktopPet']}/res/stand.gif")
+                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif")
             else:
-                self.loadMovie(f"./data/{setting['desktopPet']}/res/drop.gif")
+                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif")
 
         for func in self.state["update"].values():
             try:
@@ -196,7 +217,7 @@ class Window(QtWidgets.QWidget):
                 createLog(
                     eval(tran.run("program.plugin.loopFunction.runError")),
                     3,
-                    debug=setting["debug"],
+                    debug=setting.debug,
                 )
 
         self.desktopPet.move(self.state["position"][0], self.state["position"][1])
@@ -204,63 +225,59 @@ class Window(QtWidgets.QWidget):
     def physicsStep(self):
         # 物理时钟循环
         # Physical clock cycle
-        config["ela"] = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config["ela"]
-        config["fri"] = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config["fri"]
+        config.ela = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config.ela
+        config.fri = {"top": 0, "bottom": 0, "left": 0, "right": 0} | config.fri
 
         # 重力模拟
         # Gravity simulation
-        self.state["motion"][0] += config["acc"][0]
-        self.state["motion"][1] += config["acc"][1]
+        self.state["motion"][0] += config.acc[0]
+        self.state["motion"][1] += config.acc[1]
 
         # 速度预处理
         # Speed preprocessing
-        if self.state["motion"][0] > screenWidth - (self.state["position"][0] + 128):
+        if self.state["motion"][0] > screenWidth - (self.state["position"][0] + self.W):
             self.state["motion"][0] = (-self.state["motion"][0]) * (
-                config["ela"]["right"] / 100
+                config.ela["right"] / 100
             )
-            self.state["position"][0] = screenWidth - 128
+            self.state["position"][0] = screenWidth - self.W
         elif -self.state["motion"][0] > self.state["position"][0]:
             self.state["motion"][0] = (-self.state["motion"][0]) * (
-                config["ela"]["left"] / 100
+                config.ela["left"] / 100
             )
             self.state["position"][0] = 0
-        elif self.state["motion"][1] > screenHeight - (self.state["position"][1] + 128):
+        elif self.state["motion"][1] > screenHeight - (self.state["position"][1] + self.H):
             self.state["motion"][1] = (-self.state["motion"][1]) * (
-                config["ela"]["bottom"] / 100
+                config.ela["bottom"] / 100
             )
-            self.state["position"][1] = screenHeight - 128
+            self.state["position"][1] = screenHeight - self.H
         elif -self.state["motion"][1] > self.state["position"][1]:
             self.state["motion"][1] = (-self.state["motion"][1]) * (
-                config["ela"]["top"] / 100
+                config.ela["top"] / 100
             )
             self.state["position"][1] = 0
 
         # 摩擦力
         # Friction
         if self.state["position"][0] == 0:
-            if abs(self.motion[1]) < config["fri"]["left"]:
+            if abs(self.motion[1]) < config.fri["left"]:
                 self.motion[1] = 0
             else:
-                self.motion[1] += config["fri"]["left"] * ((-1) ** (self.motion[1] > 0))
-        elif self.state["position"][0] == screenWidth - 128:
-            if abs(self.motion[1]) < config["fri"]["right"]:
+                self.motion[1] += config.fri["left"] * ((-1) ** (self.motion[1] > 0))
+        elif self.state["position"][0] == screenWidth - self.W:
+            if abs(self.motion[1]) < config.fri["right"]:
                 self.motion[1] = 0
             else:
-                self.motion[1] += config["fri"]["right"] * (
-                    (-1) ** (self.motion[1] > 0)
-                )
+                self.motion[1] += config.fri["right"] * ((-1) ** (self.motion[1] > 0))
         if self.state["position"][1] == 0:
-            if abs(self.motion[0]) < config["fri"]["top"]:
+            if abs(self.motion[0]) < config.fri["top"]:
                 self.motion[0] = 0
             else:
-                self.motion[0] += config["fri"]["top"] * ((-1) ** (self.motion[0] > 0))
-        elif self.state["position"][1] == screenHeight - 128:
-            if abs(self.motion[0]) < config["fri"]["bottom"]:
+                self.motion[0] += config.fri["top"] * ((-1) ** (self.motion[0] > 0))
+        elif self.state["position"][1] == screenHeight - self.H:
+            if abs(self.motion[0]) < config.fri["bottom"]:
                 self.motion[0] = 0
             else:
-                self.motion[0] += config["fri"]["bottom"] * (
-                    (-1) ** (self.motion[0] > 0)
-                )
+                self.motion[0] += config.fri["bottom"] * ((-1) ** (self.motion[0] > 0))
 
         # 设置位置
         # Set position
@@ -317,7 +334,7 @@ class Window(QtWidgets.QWidget):
                 ),
             },
         }
-        createLog(tran.run("program.menu.complete"), debug=setting["debug"])
+        createLog(tran.run("program.menu.complete"), debug=setting.debug)
 
         # 导入插件
         for plugin in pluginList:
@@ -327,7 +344,7 @@ class Window(QtWidgets.QWidget):
                 def itemFunc(f=entry):
                     def _():
                         try:
-                            getattr(f, "enter")(
+                            getattr(f, setting.pluginObjectEntry)(
                                 self.image,
                                 self.mainTimer,
                                 self.physicsTimer,
@@ -338,7 +355,7 @@ class Window(QtWidgets.QWidget):
                             createLog(
                                 eval(tran.run("program.plugin.function.runError")),
                                 3,
-                                debug=setting["debug"],
+                                debug=setting.debug,
                             )
 
                     return _
@@ -349,10 +366,10 @@ class Window(QtWidgets.QWidget):
                 }
                 createLog(
                     eval(tran.run("program.plugin.function.add")),
-                    debug=setting["debug"],
+                    debug=setting.debug,
                 )
 
-        if setting["debug"]:
+        if setting.debug:
             if self.showBox:
                 menuDict[tran.run("program.menu.collisionBox")] = {
                     "__type__": "command",
@@ -371,53 +388,50 @@ class Window(QtWidgets.QWidget):
                 "__type__": "command",
                 "__func__": lambda: createLog(
                     "\n" + pprint.pformat(globals(), 2, sort_dicts=False),
-                    debug=setting["debug"],
+                    debug=setting.debug,
                 ),
             }
         menu = menuGenerate(self, menuDict)
         menu.exec(globalPos)
         createLog(
             eval(tran.run("program.menu.show")),
-            debug=setting["debug"],
+            debug=setting.debug,
         )
 
 
 # 导入数据
 # Import Data
-setting = json.load(open("./setting.json", encoding="utf-8"))
-for key in ["desktopPet", "debug"]:
-    if key not in setting:
-        logging.error(f"The setting.json file does not have the {key} key")
-        exit()
-
-config = json.load(
-    open(f"./data/{setting['desktopPet']}/config.json", encoding="utf-8")
+setting = Setting(**json.load(open("./setting.json", encoding="utf-8")))
+config = DesktopPetConfig(
+    **json.load(
+        open(f"{setting.dataDir}/{setting.desktopPet}/config.json", encoding="utf-8")
+    )
 )
-for key in [
-    "name",
-    "version",
-    "author",
-    "acc",
-    "fri",
-    "plugin",
-]:
-    if key not in config:
-        logging.error(f"The config.json file does not have the {key} key")
-        exit()
 
-tran = Translate(languageMap.TRAN, setting["language"])
+# 日志配置
+# Log Configuration
+logging.basicConfig(
+    filename=f"{setting.logPath}",
+    encoding="utf-8",
+    level=logging.DEBUG,
+    format="[%(levelname)s] <%(pathname)s> (%(asctime)s) - %(message)s",
+)
+
+tran = Translate(
+    json.load(open("./languageMap.json", encoding="utf-8")), setting.language
+)
 
 pluginList = []
-if "plugin" in config:
-    for path in config["plugin"]:
-        spec = util.spec_from_file_location(
-            "plugin", f"./data/{setting['desktopPet']}/plugin/{path}/enter.py"
-        )
-        if spec and spec.loader:
-            plugin = util.module_from_spec(spec)
-            sys.modules["plugin"] = plugin
-            spec.loader.exec_module(plugin)
-            pluginList.append(plugin)
+for path in config.plugin:
+    spec = util.spec_from_file_location(
+        "plugin",
+        f"{setting.dataDir}/{setting.desktopPet}/plugin/{path}/{setting.pluginFileName}.py",
+    )
+    if spec and spec.loader:
+        plugin = util.module_from_spec(spec)
+        sys.modules["plugin"] = plugin
+        spec.loader.exec_module(plugin)
+        pluginList.append(plugin)
 
 app = QtWidgets.QApplication(sys.argv)
 
