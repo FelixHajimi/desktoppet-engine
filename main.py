@@ -6,6 +6,8 @@ from importlib import util
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
+import languageMap
+
 # 初始化配置
 # Initialize Configuration
 logging.basicConfig(
@@ -125,7 +127,7 @@ class Window(QtWidgets.QWidget):
             "motion": self.motion,
             "screenWidth": screenWidth,
             "screenHeight": screenHeight,
-            "update": [],
+            "update": dict(),
         }
         createLog(tran.run("program.ready"), debug=setting["debug"])
 
@@ -133,7 +135,7 @@ class Window(QtWidgets.QWidget):
         # Autostart judgment
         autostartFunctions = []
         for plugin in pluginList:
-            for displayName, entry in plugin.menu.items():
+            for _displayName, entry in plugin.menu.items():
 
                 def itemFunc(f=entry):
                     return lambda: getattr(f, "enter")(
@@ -187,7 +189,7 @@ class Window(QtWidgets.QWidget):
             else:
                 self.loadMovie(f"./data/{setting['desktopPet']}/res/drop.gif")
 
-        for func in self.state["update"]:
+        for func in self.state["update"].values():
             try:
                 func()
             except Exception as error:  # noqa: F841
@@ -403,63 +405,7 @@ for key in [
         logging.error(f"The config.json file does not have the {key} key")
         exit()
 
-# 语言表
-# Language map
-TRAN = {
-    "window.complete": {
-        "en-us": "Window initialization complete",
-        "zh-cn": "窗口初始化完毕",
-    },
-    "program.ready": {"en-us": "Program is ready", "zh-cn": "程序已准备完毕"},
-    "program.plugin.autostart.add": {
-        "en-us": "f\"The {displayName} feature of the 'Desktop-pet {plugin.pluginName}' plugin has been set to auto-start.\"",
-        "zh-cn": 'f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加置自启动"',
-    },
-    "program.plugin.autostart.run": {
-        "en-us": 'f"{func} auto-start function has run"',
-        "zh-cn": 'f"{func} 自启动函数已运行"',
-    },
-    "program.plugin.autostart.runError": {
-        "en-us": 'f"{func} auto-start function run error: {error}"',
-        "zh-cn": 'f"{func} 自启动函数运行错误:{error}"',
-    },
-    "program.plugin.loopFunction.runError": {
-        "en-us": 'f"{func} loop function run error: {error}"',
-        "zh-cn": 'f"{func} 循环函数运行错误:{error}"',
-    },
-    "program.menu.exit": {"en-us": "Exit", "zh-cn": "退出"},
-    "program.menu.about.title": {
-        "en-us": "f\"About {config['name']}\"",
-        "zh-cn": "f\"关于{config['name']}\"",
-    },
-    "program.menu.about.text": {
-        "en-us": "f\"Desktop pet name: {config['name']}\\nVersion: v{config['version']}\\nAuthor: {config['author']}\"",
-        "zh-cn": "f\"桌宠名字: {config['name']}\\n版本号: v{config['version']}\\n作者: {config['author']}\"",
-    },
-    "program.menu.complete": {
-        "en-us": "Basic context menu created",
-        "zh-cn": "已创建基础右键菜单",
-    },
-    "program.plugin.function.runError": {
-        "en-us": "f\"Desktop pet {plugin.pluginName} plugin's {displayName}:{getattr(f, 'create')} function error:{error}\"",
-        "zh-cn": "f\"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, 'create')} 功能错误:{error}\"",
-    },
-    "program.plugin.function.add": {
-        "en-us": "f\"The {displayName} feature of the 'Desktop-pet {plugin.pluginName}' plugin has been added\"",
-        "zh-cn": 'f"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加"',
-    },
-    "program.menu.collisionBox": {"en-us": "Collision box", "zh-cn": "碰撞箱"},
-    "program.menu.outputParameter": {
-        "en-us": "Output all parameters",
-        "zh-cn": "输出所有参数",
-    },
-    "program.menu.show": {
-        "en-us": "f\"{setting['desktopPet']}:{config['name']} desktop pet right-click menu is displayed\"",
-        "zh-cn": "f\"{setting['desktopPet']}:{config['name']} 桌宠右键菜单已显示\"",
-    },
-}
-
-tran = Translate(TRAN, setting["language"])
+tran = Translate(languageMap.TRAN, setting["language"])
 
 pluginList = []
 if "plugin" in config:
