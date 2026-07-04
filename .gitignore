@@ -5,5 +5,5 @@ __pycache__
 # Other
 *.log
 
-# Program
+# Package
 .package
