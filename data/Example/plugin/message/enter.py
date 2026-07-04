@@ -1,21 +1,18 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
-
 class Template:
     def __init__(self):
         self.__autoStart__ = False
 
-    def enter(
-        self,
-        image: QtGui.QMovie,
-        mainTimer: QtCore.QTimer,
-        physicsTimer: QtCore.QTimer,
-        state: dict,
-        window: QtWidgets.QWidget,
-    ):
+    def enter(self, image, mainTimer, physicsTimer, state, window):
         self.__image__ = image
+        self.__mainTimer__ = mainTimer
+        self.__physicsTimer__ = physicsTimer
+        self.__state__ = state
+        self.__window__ = window
 
     def loadMovie(self, path: str):
+        """切换桌宠动画"""
         if self.__image__.fileName() != path:
             self.__image__.setFileName(path)
             self.__image__.jumpToFrame(0)
@@ -23,68 +20,34 @@ class Template:
 
 
 class Information(Template):
-    def __init__(self):
-        super().__init__()
-
-    def enter(
-        self,
-        image: QtGui.QMovie,
-        mainTimer: QtCore.QTimer,
-        physicsTimer: QtCore.QTimer,
-        state: dict,
-        window: QtWidgets.QWidget,
-    ):
+    def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
-        QtWidgets.QMessageBox.information(window, "消息", "消息正文")
+        QtWidgets.QMessageBox.information(window, "消息", "这是一条提示消息")
 
 
 class Question(Template):
-    def __init__(self):
-        super().__init__()
-
-    def enter(
-        self,
-        image: QtGui.QMovie,
-        mainTimer: QtCore.QTimer,
-        physicsTimer: QtCore.QTimer,
-        state: dict,
-        window: QtWidgets.QWidget,
-    ):
+    def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
-        QtWidgets.QMessageBox.question(window, "问题", "问题正文")
+        QtWidgets.QMessageBox.question(window, "问题", "确定要执行此操作吗？")
 
 
 class Warning(Template):
-    def __init__(self):
-        super().__init__()
-
-    def enter(
-        self,
-        image: QtGui.QMovie,
-        mainTimer: QtCore.QTimer,
-        physicsTimer: QtCore.QTimer,
-        state: dict,
-        window: QtWidgets.QWidget,
-    ):
+    def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
-        QtWidgets.QMessageBox.warning(window, "警告", "警告正文")
+        QtWidgets.QMessageBox.warning(window, "警告", "这是一个警告信息")
 
 
 class Error(Template):
-    def __init__(self):
-        super().__init__()
-
-    def enter(
-        self,
-        image: QtGui.QMovie,
-        mainTimer: QtCore.QTimer,
-        physicsTimer: QtCore.QTimer,
-        state: dict,
-        window: QtWidgets.QWidget,
-    ):
+    def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
-        QtWidgets.QMessageBox.critical(window, "错误", "错误正文")
+        QtWidgets.QMessageBox.critical(window, "错误", "发生了一个错误")
 
 
-menu = {"消息": Information(), "问题": Question(), "警告": Warning(), "错误": Error()}
 pluginName = "弹窗消息"
+
+menu = {
+    "消息": Information(),
+    "问题": Question(),
+    "警告": Warning(),
+    "错误": Error()
+}

@@ -14,6 +14,10 @@ class Template:
         window: QtWidgets.QWidget,
     ):
         self.__image__ = image
+        self.__mainTimer__ = mainTimer
+        self.__physicsTimer__ = physicsTimer
+        self.__state__ = state
+        self.__window__ = window
 
     def loadMovie(self, path: str):
         if self.__image__.fileName() != path:
