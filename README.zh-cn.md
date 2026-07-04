@@ -1,4 +1,7 @@
 # DesktopPet-Engine(桌宠引擎)
+[![GitHub Repo stars](https://img.shields.io/github/stars/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
+[![GitHub forks](https://img.shields.io/github/forks/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 一个轻量级的桌宠加载引擎，支持物理模拟、插件扩展、国际化、日志记录。让任何角色都能在你的桌面上活过来
 
 <!--## 演示视频
