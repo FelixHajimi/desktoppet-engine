@@ -1,5 +1,5 @@
 {
-    "desktopPet": "Example",
-    "debug": false,
-    "language": "zh-cn"
+  "desktopPet": "Example",
+  "debug": true,
+  "language": "zh-cn"
 }
