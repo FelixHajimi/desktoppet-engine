@@ -1,53 +1,122 @@
-# 桌面宠物（Desktop Pet）
+# DesktopPet-Engine
+A lightweight desktop pet loading engine that supports physics simulation, plugin extensions, internationalization, and logging. It brings any character to life on your desktop.
 
-## 开始
+<!--## Demo Video
+> Using a  as material for demonstration
 
-### 依赖要求
+| Interactive Effects | Right-Click Menu | Office Assistance |
+| --- | --- | --- |
+| Interactive Effects | Right-Click Menu | Office Assistance |-->
+<!--Materials are currently being solicited, artists are welcome to contribute! 🙇-->
 
-- Python 3.8+
-- PySide6
-- 支持 GIF 动画的系统
+## What It Can Do
+### For Users
+- Desktop Pet: A cute little companion on your desktop that falls with gravity, bounces, and has physical collision
+- Drag Interaction: Click and hold the left button to drag it up and throw it out – it will bounce physically
+- Multi-State Animation: Standing, falling, being dragged – each state automatically switches to the corresponding animation
+- Plugin Extension: Supports loading plugins to enable more features (e.g., timed reminders, weather display, etc.)
+- Multi-Language: Built-in Chinese and English switching, configurable as needed
+- Always on Top: Stays on the topmost layer of the desktop, never blocked by other windows
+### For Developers
+- Character Pack Ready to Use: Just prepare image assets and a config.json file – no coding required
+- Freely Adjustable Physics Parameters: Gravity, bounce coefficient, friction – all customizable
+- Plugin System: Supports Python plugins for extending any interactive logic
+- Debug Mode: Displays collision boxes, outputs runtime parameters for easy tuning
 
-### 目录要求
-
-你的项目根目录应包含以下文件:
-
+## Project Structure
 ```text
-your-project/
-├── main.py                   主程序
-├── setting.json              启动设置
-└── data/                     存放所有桌宠的文件夹
-    ├── [桌宠文件夹]/          例如:my_cat
-    │   ├── config.json       桌宠配置(名称、版本、作者、插件等)
-    │   ├── plugin/           可选,存放当前桌宠插件的目录 
-    │   │   ├── [插件1文件夹]/ 例如:AI-Cat
-    │   │   │   ├── ...       其他资源
-    │   │   │   └── main.py   入口程序
-    │   │   └── ...           其他插件
-    │   └─res/                桌宠素材
-    │     ├── icon.gif        桌宠图标
-    │     └── basic/
-    │         ├── drop.gif    下落动画
-    │         └── stand.gif   待机动画
-    └── ...                   其他桌宠
+├─ data/                      Root directory for all desktop pets
+│  └─ pet_name/               Individual pet folder
+│     ├─ config.json          Pet configuration
+│     ├─ plugin/              Pet plugins
+│     │  └─ [plugin_name]/    Individual plugin folder
+│     │     └─ enter.py       Plugin entry point
+│     └─ res/                 Pet resource files
+│        ├─ drop.gif          Falling
+│        ├─ icon.gif          Icon
+│        └─ stand.gif         Standing
+├─ languageMap.py             Internationalization language map
+├─ main.py                    Main program
+└─ setting.json               Startup settings
 ```
 
-### 示例 setting.json:
-```json
-{
-  "desktopPet": "my_cat",
-  "debug": false
-}
-```
+## How to Get Started
+> Regular users can directly download the packaged program and use it
+### Testing
+You need a Python environment with PySide6 installed to run it.
 
-### 示例 config.json:
+Run `python main.py` in the terminal – if successful, the assets in the res folder will be displayed.
+
+### Pet Configuration
 ```json
 {
-  "name": "小橘",
-  "version": "1.0.0",
-  "author": "ABC",
-  "acc": [0.3, 0.5],
-  "fri": [0.8, 0.8],
-  "plugin": [ "main" ]
+  "name": "",
+  "version": "",
+  "author": "",
+  "acc": [...],
+  "fri": {...},
+  "ela": {...},
+  "plugin": [...]
 }
 ```
+| Key | Description | Recommended Value |
+| --- | --- | --- |
+| name | Pet name | |
+| version | Version number | |
+| author | Author | |
+| acc | Gravity acceleration | [0, 0.8~2] |
+| fri | Friction | t\|b=1~5 l\|r=0 |
+| ela | Bounce coefficient | b=5 l\|r=10 |
+| plugin | List of plugins to load | |
+
+See `docs/English/pet_config.md` for details.
+
+### Startup Settings
+```json
+{
+    "desktopPet": "Example",
+    "debug": true,
+    "language": "en-us"
+}
+```
+| Key | Description |
+| --- | --- |
+| desktopPet | The pet to load when the program starts |
+| debug | Debug mode status |
+| language | Language to be used by the program |
+
+See `docs/English/startup_settings.md` for details.
+
+## Frequently Asked Questions
+Q: Why does it fail to start and show an error?  
+A: It might be a configuration issue. Please submit an issue or check the relevant solutions.
+
+Q: Why is my pet stuck at the edge of the screen?  
+A: Check the `fri` setting of your pet. If it is greater than `acc`, adjust it to a normal value.
+
+Q: Can I run multiple pets at the same time?  
+A: Currently only single instance is supported. Multi-instance support is under development.
+
+Q: How do I switch languages?  
+A: Change the `language` in `setting.json` to `zh-cn` (Chinese) or `en-us` (English).
+
+Q: What if a plugin fails to load?  
+A: Check that the `plugin` list in `config.json` matches the folder names under `/data/pet_name/plugin/`, and ensure `enter.py` exists with correct syntax. Error logs will be written to `/last.log`.
+
+Q: I want to create my own character pack – do I need to know programming?  
+A: Generally no. A **basic** character only needs art assets – no programming skills required.
+
+Q: How do I report a Bug?  
+A: Please describe the issue and attach the `./last.log` log file when submitting an issue.
+
+## Community Group
+QQ Group: 109956850  
+Please check the group announcement upon joining.
+
+## Contributing
+If you have suggestions or feedback for this project, please submit your ideas or improvement points via issue.
+
+We are currently soliciting character assets! If you are good at pixel art / chibi-style characters, welcome to join the QQ group or submit an Issue!
+
+## Related Documentation
+Please refer to `/docs/English/*`
