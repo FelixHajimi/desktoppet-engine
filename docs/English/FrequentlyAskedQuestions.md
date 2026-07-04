@@ -29,7 +29,13 @@
 {
   "desktopPet": "Example",
   "debug": false,
-  "language": "en-us"
+  "language": "en-us",
+  "dataDir": "data",
+  "desktoppetResourceDir": "res",
+  "pluginFileName": "enter",
+  "pluginObjectEntry": "enter",
+  "logPath": "./last.log",
+  "imageSize": [128, 128]
 }
 ```
 
@@ -37,7 +43,7 @@
 
 **Q: Where is the log file located?**
 
-**A:** The log file is `last.log` in the root directory, containing all log output during program runtime. More detailed information is output when debug mode is enabled.
+**A:** The log file path is specified by `logPath` in `setting.json`, defaulting to `last.log` in the root directory. It contains all log output during program runtime. More detailed information is output when debug mode is enabled.
 
 ---
 
@@ -105,7 +111,7 @@ Currently supported languages:
 
 **Q: The pet size is incorrect?**
 
-**A:** Ensure the GIFs are exactly **128x128 pixels**. Other sizes will cause display issues.
+**A:** Ensure the GIF dimensions match the `imageSize` setting in `setting.json`.
 
 ---
 
@@ -121,7 +127,7 @@ Currently supported languages:
 
 **A:** Check the following:
 1. The `plugin` list in `config.json` matches the folder names under the `plugin/` directory
-2. Each plugin directory contains an `enter.py` file
+2. Each plugin directory contains the file specified by `pluginFileName` in `setting.json` (default: `enter.py`)
 3. `pluginName` and `menu` are properly defined in `enter.py`
 4. Error logs are written to `last.log`
 
@@ -157,10 +163,10 @@ pyinstaller --onefile --windowed --name "DesktopPet" main.py
 
 **Q: The pet doesn't run after packaging?**
 
-**A:** Check that the `data/` directory and `setting.json` are included in the package. You may need to use the `--add-data` parameter:
+**A:** Check that the `data/` directory, `setting.json`, and `languageMap.json` are included in the package. You may need to use the `--add-data` parameter:
 
 ```bash
-pyinstaller --onefile --windowed --add-data "data;data" --add-data "setting.json;." main.py
+pyinstaller --onefile --windowed --add-data "data;data" --add-data "setting.json;." --add-data "languageMap.json;." main.py
 ```
 
 ---
