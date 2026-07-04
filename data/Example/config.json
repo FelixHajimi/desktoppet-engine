@@ -4,13 +4,12 @@
   "author": "你",
   "acc": [0, 0.5],
   "fri": {
-    "top": 2,
-    "bottom": 2
+    "bottom": 1
   },
   "ela": {
-    "bottom": 5,
     "left": 10,
-    "right": 10
+    "right": 10,
+    "bottom": 30
   },
-  "plugin": ["sayhello"]
+  "plugin": ["message"]
 }
