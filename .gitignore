@@ -2,6 +2,9 @@
 .venv
 __pycache__
 
+# Node.js
+node_modules
+
 # Other
 *.log
 
