@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+      }
+
+      body {
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #control_area {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        flex: 4;
+      }
+
+      #control_area div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 8;
+      }
+
+      #control_area div img {
+        box-shadow: black 1px 1px 1px 1px;
+        border-radius: 25px;
+        margin-bottom: 10px;
+        transition: 0.5s;
+      }
+
+      #control_area div img:hover {
+        transform: translateY(-5px);
+      }
+
+      #control_area button {
+        flex: 1;
+        font-size: 24px;
+        padding: 3px;
+        border: 1px solid black;
+        border-radius: 10px;
+        background-color: white;
+        transition: 0.2s;
+      }
+
+      #control_area button:hover {
+        background-color: rgb(243, 243, 243);
+      }
+
+      #control_area button:active {
+        background-color: rgb(228, 228, 228);
+      }
+
+      #information_area {
+        flex: 6;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="control_area">
+      <div>
+        <img alt="Icon" id="icon" />
+        <p id="pet_name" style="font-size: 24px">(桌宠名称)</p>
+        <p id="pet_verstion" style="font-size: 18px">(桌宠版本)</p>
+        <p id="pet_author" style="font-size: 18px">(桌宠作者)</p>
+      </div>
+      <button id="start_button">启动</button>
+      <button>选择桌宠实例</button>
+    </div>
+    <div id="information_area"></div>
+    <script src="./main.js"></script>
+  </body>
+</html>
