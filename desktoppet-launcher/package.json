@@ -1,0 +1,19 @@
+{
+  "name": "desktoppet-launcher",
+  "version": "1.0.0",
+  "description": "This is a launcher app for desktoppet project",
+  "main": "run.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "FelixHajimi",
+  "license": "Apache 2.0 License",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "child_process": "^1.0.2",
+    "electron": "^43.0.0",
+    "typescript": "^6.0.3"
+  }
+}
