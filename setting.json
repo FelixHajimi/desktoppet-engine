@@ -2,7 +2,7 @@
   "desktopPet": "Example",
   "debug": true,
   "language": "zh-cn",
-  "dataDir": "data",
+  "dataDir": "E:/Felix/Project/Code/desktoppet-engine/data",
   "desktoppetResourceDir": "res",
   "pluginFileName": "enter",
   "pluginObjectEntry": "enter",
