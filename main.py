@@ -156,7 +156,7 @@ class Window(QtWidgets.QWidget):
         # Autostart judgment
         autostartFunctions = []
         for plugin in pluginList:
-            for _displayName, entry in plugin.menu.items():
+            for displayName, entry in plugin.menu.items():
 
                 def itemFunc(f=entry):
                     return lambda: getattr(f, setting.pluginObjectEntry)(
