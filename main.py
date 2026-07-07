@@ -15,17 +15,17 @@ def menuGenerate(master: QtWidgets.QWidget, structure: dict):
 
     def func(mainMenu: QtWidgets.QMenu, structure: dict):
         for i in structure.keys():
-            if i == "__type__":
+            if i == "_type":
                 continue
-            elif i == "__debug__":
+            elif i == "_debug":
                 continue
-            elif structure[i]["__type__"] == "command":
+            elif structure[i]["_type"] == "cmd":
                 command = QtGui.QAction(i, mainMenu)
-                command.triggered.connect(structure[i]["__func__"])
+                command.triggered.connect(structure[i]["_func"])
                 mainMenu.addAction(command)
-            elif structure[i]["__type__"] == "sep":
+            elif structure[i]["_type"] == "sep":
                 mainMenu.addSeparator()
-            elif structure[i]["__type__"] == "menu":
+            elif structure[i]["_type"] == "menu":
                 submenu = QtWidgets.QMenu(i, mainMenu)
                 func(submenu, structure[i])
                 mainMenu.addMenu(submenu)
@@ -81,7 +81,7 @@ class Setting:
     dataDir: str
     desktoppetResourceDir: str
     pluginFileName: str
-    pluginObjectEntry: str
+    pluginObjectEnter: str
     imageSize: list[int]
     language: str = "en-us"
     debug: bool = False
@@ -106,7 +106,9 @@ class Window(QtWidgets.QWidget):
         super().__init__()
         self.setWindowTitle(config.name)
         self.setWindowIcon(
-            QtGui.QIcon(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif")
+            QtGui.QIcon(
+                f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif"
+            )
         )
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
@@ -156,10 +158,10 @@ class Window(QtWidgets.QWidget):
         # Autostart judgment
         autostartFunctions = []
         for plugin in pluginList:
-            for _displayName, entry in plugin.menu.items():
+            for displayName, entry in plugin.menu.items():
 
                 def itemFunc(f=entry):
-                    return lambda: getattr(f, setting.pluginObjectEntry)(
+                    return lambda: getattr(f, setting.pluginObjectEnter)(
                         self.image,
                         self.mainTimer,
                         self.physicsTimer,
@@ -167,7 +169,7 @@ class Window(QtWidgets.QWidget):
                         self,
                     )
 
-                if getattr(entry, "__autoStart__"):
+                if getattr(entry, "_autoStart"):
                     autostartFunctions.append(itemFunc())
                     createLog(
                         eval(tran.run("program.plugin.autostart.add")),
@@ -206,9 +208,13 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config.acc[0]
                 and abs(self.state["motion"][1]) <= config.acc[1]
             ):
-                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif")
+                self.loadMovie(
+                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif"
+                )
             else:
-                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif")
+                self.loadMovie(
+                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif"
+                )
 
         for func in self.state["update"].values():
             try:
@@ -245,7 +251,9 @@ class Window(QtWidgets.QWidget):
                 config.ela["left"] / 100
             )
             self.state["position"][0] = 0
-        elif self.state["motion"][1] > screenHeight - (self.state["position"][1] + self.H):
+        elif self.state["motion"][1] > screenHeight - (
+            self.state["position"][1] + self.H
+        ):
             self.state["motion"][1] = (-self.state["motion"][1]) * (
                 config.ela["bottom"] / 100
             )
@@ -322,12 +330,12 @@ class Window(QtWidgets.QWidget):
         # Right-click menu
         menuDict = {
             tran.run("program.menu.exit"): {
-                "__type__": "command",
-                "__func__": self.close,
+                "_type": "cmd",
+                "_func": self.close,
             },
             eval(tran.run("program.menu.about.title")): {
-                "__type__": "command",
-                "__func__": lambda: QtWidgets.QMessageBox.about(
+                "_type": "cmd",
+                "_func": lambda: QtWidgets.QMessageBox.about(
                     self,
                     eval(tran.run("program.menu.about.title")),
                     eval(tran.run("program.menu.about.text")),
@@ -338,13 +346,14 @@ class Window(QtWidgets.QWidget):
 
         # 导入插件
         for plugin in pluginList:
-            menuDict[plugin.pluginName] = {"__type__": "menu"}
+            menuDict[plugin.pluginName] = {"_type": "menu"}
             for displayName, entry in plugin.menu.items():
 
-                def itemFunc(f=entry):
+                def itemFunc(func=entry):
                     def _():
+                        nonlocal displayName
                         try:
-                            getattr(f, setting.pluginObjectEntry)(
+                            getattr(func, setting.pluginObjectEnter)(
                                 self.image,
                                 self.mainTimer,
                                 self.physicsTimer,
@@ -361,8 +370,8 @@ class Window(QtWidgets.QWidget):
                     return _
 
                 menuDict[plugin.pluginName][displayName] = {
-                    "__type__": "command",
-                    "__func__": itemFunc(),
+                    "_type": "cmd",
+                    "_func": itemFunc(),
                 }
                 createLog(
                     eval(tran.run("program.plugin.function.add")),
@@ -372,21 +381,21 @@ class Window(QtWidgets.QWidget):
         if setting.debug:
             if self.showBox:
                 menuDict[tran.run("program.menu.collisionBox")] = {
-                    "__type__": "command",
-                    "__func__": lambda: self.desktopPet.setStyleSheet(""),
+                    "_type": "cmd",
+                    "_func": lambda: self.desktopPet.setStyleSheet(""),
                 }
                 self.showBox = False
             else:
                 menuDict[tran.run("program.menu.collisionBox")] = {
-                    "__type__": "command",
-                    "__func__": lambda: self.desktopPet.setStyleSheet(
+                    "_type": "cmd",
+                    "_func": lambda: self.desktopPet.setStyleSheet(
                         "border: 1px solid red;"
                     ),
                 }
                 self.showBox = True
             menuDict[tran.run("program.menu.outputParameter")] = {
-                "__type__": "command",
-                "__func__": lambda: createLog(
+                "_type": "cmd",
+                "_func": lambda: createLog(
                     "\n" + pprint.pformat(globals(), 2, sort_dicts=False),
                     debug=setting.debug,
                 ),
