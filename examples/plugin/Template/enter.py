@@ -3,7 +3,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 class Template:
     def __init__(self):
-        self.__autoStart__ = False
+        self._autoStart = False
 
     def enter(
         self,
@@ -13,17 +13,17 @@ class Template:
         state: dict,
         window: QtWidgets.QWidget,
     ):
-        self.__image__ = image
-        self.__mainTimer__ = mainTimer
-        self.__physicsTimer__ = physicsTimer
-        self.__state__ = state
-        self.__window__ = window
+        self._image = image
+        self._mainTimer = mainTimer
+        self._physicsTimer = physicsTimer
+        self._state = state
+        self._window = window
 
     def loadMovie(self, path: str):
-        if self.__image__.fileName() != path:
-            self.__image__.setFileName(path)
-            self.__image__.jumpToFrame(0)
-        self.__image__.start()
+        if self._image.fileName() != path:
+            self._image.setFileName(path)
+            self._image.jumpToFrame(0)
+        self._image.start()
 
 
 menu = {}
