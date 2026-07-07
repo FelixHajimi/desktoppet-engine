@@ -30,10 +30,10 @@ The program will look for the corresponding pet folder in the directory specifie
 
 Global debug mode toggle.
 
-| Value | Description |
-|------|------|
-| `true` | Enable debug mode, output detailed logs, show collision boxes |
-| `false` | Disable debug mode, only output necessary information |
+| Value   | Description                                                   |
+| ------- | ------------------------------------------------------------- |
+| `true`  | Enable debug mode, output detailed logs, show collision boxes |
+| `false` | Disable debug mode, only output necessary information         |
 
 When enabled, the right-click menu will display additional options like "Collision Box" and "Output Parameters" for development and debugging purposes.
 
@@ -45,15 +45,15 @@ The interface language used by the program. This affects log output, right-click
 
 Currently supported languages:
 
-| Language | Code |
-| --- | --- |
+| Language                 | Code    |
+| ------------------------ | ------- |
 | Chinese (Mainland China) | `zh-cn` |
-| Chinese (Taiwan Region) | `zh-tw` |
-| English (United States) | `en-us` |
-| Japanese (Japan) | `ja-jp` |
-| Korean (South Korea) | `ko-kr` |
-| Russian (Russia) | `ru-ru` |
-| French (France) | `fr-fr` |
+| Chinese (Taiwan Region)  | `zh-tw` |
+| English (United States)  | `en-us` |
+| Japanese (Japan)         | `ja-jp` |
+| Korean (South Korea)     | `ko-kr` |
+| Russian (Russia)         | `ru-ru` |
+| French (France)          | `fr-fr` |
 
 ---
 

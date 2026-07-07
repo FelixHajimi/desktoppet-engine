@@ -36,6 +36,7 @@ data/
 ```
 
 **Naming Conventions**:
+
 - Use English letters, numbers, and underscores
 - Avoid special characters or spaces
 - Examples: `MyPet`, `cat_white`, `robot_v2`
@@ -56,11 +57,11 @@ data/MyPet/
 
 #### Asset Requirements
 
-| File | Description | Size | Format |
-|------|------|------|------|
-| `stand.gif` | Standing/idle animation | 128x128 | GIF |
-| `drop.gif` | Falling/moving animation | 128x128 | GIF |
-| `icon.gif` | Taskbar/title bar icon | 128x128 | GIF |
+| File        | Description              | Size    | Format |
+| ----------- | ------------------------ | ------- | ------ |
+| `stand.gif` | Standing/idle animation  | 128x128 | GIF    |
+| `drop.gif`  | Falling/moving animation | 128x128 | GIF    |
+| `icon.gif`  | Taskbar/title bar icon   | 128x128 | GIF    |
 
 #### Tips
 
@@ -117,7 +118,7 @@ For detailed field descriptions, see: [PetConfiguration](./PetConfiguration.md)
 
 ```json
 {
-  "desktopPet": "MyPet",   // Change to your pet folder name
+  "desktopPet": "MyPet", // Change to your pet folder name
   "debug": false,
   "language": "en-us"
 }
@@ -132,14 +133,14 @@ For detailed field descriptions, see: [PetConfiguration](./PetConfiguration.md)
 
 If the pet's behavior isn't ideal, adjust the physics parameters in `config.json`. For detailed parameter explanations
 
-| Issue | Adjustment |
-|------|----------|
-| Falls too fast | Decrease `acc` `y` value |
-| Falls too slow | Increase `acc` `y` value |
-| Bounces too strongly | Decrease `ela` values in corresponding directions |
-| Bounces too weakly | Increase `ela` values in corresponding directions |
-| Stuck at edge | Check if `fri` is too high; reduce if necessary |
-| Doesn't move horizontally | Increase `acc` `x` value |
+| Issue                     | Adjustment                                        |
+| ------------------------- | ------------------------------------------------- |
+| Falls too fast            | Decrease `acc` `y` value                          |
+| Falls too slow            | Increase `acc` `y` value                          |
+| Bounces too strongly      | Decrease `ela` values in corresponding directions |
+| Bounces too weakly        | Increase `ela` values in corresponding directions |
+| Stuck at edge             | Check if `fri` is too high; reduce if necessary   |
+| Doesn't move horizontally | Increase `acc` `x` value                          |
 
 ---
 

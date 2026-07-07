@@ -98,15 +98,15 @@ def enter(self, image, mainTimer, physicsTimer, state, window):
     pass
 ```
 
-#### 4. `__autoStart__` Attribute (Optional)
+#### 4. `_autoStart` Attribute (Optional)
 
-Define the `__autoStart__` attribute in the class to control whether the `enter` method is automatically executed when the program starts:
+Define the `_autoStart` attribute in the class to control whether the `enter` method is automatically executed when the program starts:
 
 ```python
 class Information(Template):
-    def __init__(self):
+    def _init(self):
         super().__init__()
-        self.__autoStart__ = True  # Auto-execute on startup
+        self._autoStart = True  # Auto-execute on startup
 ```
 
 ---
@@ -119,21 +119,21 @@ from PySide6 import QtCore, QtGui, QtWidgets
 # Base template class
 class Template:
     def __init__(self):
-        self.__autoStart__ = False
+        self._autoStart = False
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
-        self.__image__ = image
-        self.__mainTimer__ = mainTimer
-        self.__physicsTimer__ = physicsTimer
-        self.__state__ = state
-        self.__window__ = window
+        self._image = image
+        self._mainTimer = mainTimer
+        self._physicsTimer = physicsTimer
+        self._state = state
+        self._window = window
 
     def loadMovie(self, path: str):
         """Switch pet animation"""
-        if self.__image__.fileName() != path:
-            self.__image__.setFileName(path)
-            self.__image__.jumpToFrame(0)
-        self.__image__.start()
+        if self._image.fileName() != path:
+            self._image.setFileName(path)
+            self._image.jumpToFrame(0)
+        self._image.start()
 
 
 # Specific functionality classes
@@ -174,7 +174,7 @@ menu = {
 
 ---
 
-### Plugin with __autoStart__ Example
+### Plugin with **autoStart** Example
 
 ```python
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -182,36 +182,36 @@ import random
 
 class Template:
     def __init__(self):
-        self.__autoStart__ = False
+        self._autoStart = False
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
-        self.__image__ = image
-        self.__mainTimer__ = mainTimer
-        self.__physicsTimer__ = physicsTimer
-        self.__state__ = state
-        self.__window__ = window
+        self._image = image
+        self._mainTimer = mainTimer
+        self._physicsTimer = physicsTimer
+        self._state = state
+        self._window = window
 
 
 class Reminder(Template):
     def __init__(self):
         super().__init__()
-        self.__autoStart__ = True  # Auto-execute on startup
+        self._autoStart = True  # Auto-execute on startup
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
         print("Reminder plugin loaded!")
-        
+
         # Start a timer that shows a reminder every 30 seconds
         timer = QtCore.QTimer()
         timer.timeout.connect(self.show_reminder)
         timer.start(30000)
-        self.__state__["reminder_timer"] = timer
+        self._state["reminder_timer"] = timer
 
     def show_reminder(self):
         messages = ["Time for a break!", "Get up and stretch!", "Have some water!"]
         QtWidgets.QMessageBox.information(
-            self.__window__, 
-            "Reminder", 
+            self._window,
+            "Reminder",
             random.choice(messages)
         )
 
@@ -246,31 +246,31 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 class Template:
     def __init__(self):
-        self.__autoStart__ = False
+        self._autoStart = False
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
-        self.__image__ = image
-        self.__mainTimer__ = mainTimer
-        self.__physicsTimer__ = physicsTimer
-        self.__state__ = state
-        self.__window__ = window
+        self._image = image
+        self._mainTimer = mainTimer
+        self._physicsTimer = physicsTimer
+        self._state = state
+        self._window = window
 
 
 class AutoMove(Template):
     def __init__(self):
-        super().__init__()
-        self.__autoStart__ = True
+        super()._init()
+        self._autoStart = True
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
-        
+
         def update():
             # Executes every frame: makes the pet swing left and right
             import math
             time = QtCore.QDateTime.currentMSecsSinceEpoch() / 1000
             state["motion"][0] = math.sin(time) * 2
             state["motion"][1] = -1
-        
+
         state["update"]["auto_move"] = update
 
 

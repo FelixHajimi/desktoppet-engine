@@ -7,6 +7,7 @@
 **Q: The program does nothing when launched?**
 
 **A:** Please check the following:
+
 1. Verify that PySide6 is installed: `pip install PySide6`
 2. Check that `setting.json` exists in the root directory
 3. Check the `last.log` log file for error messages
@@ -16,6 +17,7 @@
 **Q: The program reports that the pet cannot be found on startup?**
 
 **A:** Check that the `desktopPet` value in `setting.json` matches a folder name under the `data/` directory.
+
 - For example, `"desktopPet": "Example"` corresponds to `data/Example/`
 - Folder names are case-sensitive
 
@@ -75,6 +77,7 @@ Currently supported languages:
 **Q: The pet falls too fast or too slow?**
 
 **A:** Adjust the `y` value in the `acc` parameter:
+
 - Higher values result in faster falling
 - Recommended range: `0.8 ~ 2`
 
@@ -84,11 +87,11 @@ Currently supported languages:
 
 **A:** Check the `ela` parameter. Higher values result in stronger bounces. For example, `10` means a 10% velocity rebound.
 
-| Direction | Recommended Value |
-|------|--------|
-| Bottom bounce | `5` |
-| Left/Right bounce | `10` |
-| Top bounce | `0` |
+| Direction         | Recommended Value |
+| ----------------- | ----------------- |
+| Bottom bounce     | `5`               |
+| Left/Right bounce | `10`              |
+| Top bounce        | `0`               |
 
 ---
 
@@ -103,6 +106,7 @@ Currently supported languages:
 **Q: The pet doesn't display animations?**
 
 **A:** Verify the following:
+
 1. `stand.gif` and `drop.gif` exist in the `res/` directory
 2. Files are valid GIF format
 3. Filenames are correct (case-sensitive, all lowercase)
@@ -126,6 +130,7 @@ Currently supported languages:
 **Q: A plugin fails to load?**
 
 **A:** Check the following:
+
 1. The `plugin` list in `config.json` matches the folder names under the `plugin/` directory
 2. Each plugin directory contains the file specified by `pluginFileName` in `setting.json` (default: `enter.py`)
 3. `pluginName` and `menu` are properly defined in `enter.py`
@@ -136,6 +141,7 @@ Currently supported languages:
 **Q: The plugin menu doesn't appear?**
 
 **A:** Verify:
+
 1. The plugin is correctly listed in the `plugin` array
 2. `pluginName` is defined
 3. The `menu` dictionary is not empty
@@ -144,7 +150,7 @@ Currently supported languages:
 
 **Q: Auto-start doesn't execute for a plugin?**
 
-**A:** Confirm that `self.__autoStart__ = True` is set in the class.
+**A:** Confirm that `self._autoStart = True` is set in the class.
 
 ---
 
@@ -194,6 +200,7 @@ pyinstaller --onefile --windowed --add-data "data;data" --add-data "setting.json
 **Q: I don't understand the error message. What should I do?**
 
 **A:**
+
 1. Check the `last.log` log file
 2. Submit an Issue with the error information and logs
 3. Join the QQ group (109956850) for help
