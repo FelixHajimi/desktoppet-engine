@@ -13,21 +13,46 @@ from PySide6 import QtCore, QtGui, QtWidgets
 def menuGenerate(master: QtWidgets.QWidget, structure: dict):
     menu = QtWidgets.QMenu(master)
 
-    def func(mainMenu: QtWidgets.QMenu, structure: dict):
-        for i in structure.keys():
-            if i == "__type__":
+    def func(
+        mainMenu: QtWidgets.QMenu, structure: dict, master: QtWidgets.QWidget = master
+    ):
+        for key in structure.keys():
+            if key in ["_type", "_func", "_enter"]:
                 continue
-            elif i == "__debug__":
-                continue
-            elif structure[i]["__type__"] == "command":
-                command = QtGui.QAction(i, mainMenu)
-                command.triggered.connect(structure[i]["__func__"])
+            elif structure[key]["_type"] == "$":
+                command = QtGui.QAction(key, mainMenu)
+                if "_func" in structure[key]:
+                    command.triggered.connect(structure[key]["_func"])
+                elif "_enter" in structure[key]:
+
+                    def itemFunc(func=structure[key]["_enter"]):
+                        def insideFunc():
+                            try:
+                                getattr(func, setting.pluginObjectEnter)(
+                                    master.image,
+                                    master.mainTimer,
+                                    master.physicsTimer,
+                                    master.state,
+                                    master,
+                                )
+                            except Exception as error:  # noqa: F841
+                                displayName = key
+                                createLog(
+                                    eval(tran.run("program.plugin.function.runError")),
+                                    3,
+                                    debug=setting.debug,
+                                )
+
+                        return insideFunc
+
+                    command.triggered.connect(itemFunc())
+
                 mainMenu.addAction(command)
-            elif structure[i]["__type__"] == "sep":
+            elif structure[key]["_type"] == "-":
                 mainMenu.addSeparator()
-            elif structure[i]["__type__"] == "menu":
-                submenu = QtWidgets.QMenu(i, mainMenu)
-                func(submenu, structure[i])
+            elif structure[key]["_type"] == "/":
+                submenu = QtWidgets.QMenu(key, mainMenu)
+                func(submenu, structure[key])
                 mainMenu.addMenu(submenu)
 
     func(menu, structure)
@@ -81,7 +106,7 @@ class Setting:
     dataDir: str
     desktoppetResourceDir: str
     pluginFileName: str
-    pluginObjectEntry: str
+    pluginObjectEnter: str
     imageSize: list[int]
     language: str = "en-us"
     debug: bool = False
@@ -106,7 +131,9 @@ class Window(QtWidgets.QWidget):
         super().__init__()
         self.setWindowTitle(config.name)
         self.setWindowIcon(
-            QtGui.QIcon(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif")
+            QtGui.QIcon(
+                f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif"
+            )
         )
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
@@ -154,38 +181,25 @@ class Window(QtWidgets.QWidget):
 
         # 自启动判断
         # Autostart judgment
-        autostartFunctions = []
+        def autostart(structure: dict):
+            for key in structure.keys():
+                if key in ["_type", "_func", "_enter"]:
+                    continue
+                elif structure[key]["_type"] == "$":
+                    if "_enter" in structure[key]:
+                        if getattr(structure[key]["_enter"], "_autoStart"):
+                            getattr(structure[key]["_enter"], "enter")(
+                                self.image,
+                                self.mainTimer,
+                                self.physicsTimer,
+                                self.state,
+                                self,
+                            )
+                elif structure[key]["_type"] == "/":
+                    autostart(structure[key])
+
         for plugin in pluginList:
-            for _displayName, entry in plugin.menu.items():
-
-                def itemFunc(f=entry):
-                    return lambda: getattr(f, setting.pluginObjectEntry)(
-                        self.image,
-                        self.mainTimer,
-                        self.physicsTimer,
-                        self.state,
-                        self,
-                    )
-
-                if getattr(entry, "__autoStart__"):
-                    autostartFunctions.append(itemFunc())
-                    createLog(
-                        eval(tran.run("program.plugin.autostart.add")),
-                        debug=setting.debug,
-                    )
-        for func in autostartFunctions:
-            try:
-                func()
-                createLog(
-                    eval(tran.run("program.plugin.autostart.run")),
-                    debug=setting.debug,
-                )
-            except Exception as error:  # noqa: F841
-                createLog(
-                    eval(tran.run("program.plugin.autostart.runError")),
-                    3,
-                    debug=setting.debug,
-                )
+            autostart(plugin.menu)
 
     def loadMovie(self, path: str):
         # 加载动画
@@ -206,9 +220,13 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config.acc[0]
                 and abs(self.state["motion"][1]) <= config.acc[1]
             ):
-                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif")
+                self.loadMovie(
+                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif"
+                )
             else:
-                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif")
+                self.loadMovie(
+                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif"
+                )
 
         for func in self.state["update"].values():
             try:
@@ -245,7 +263,9 @@ class Window(QtWidgets.QWidget):
                 config.ela["left"] / 100
             )
             self.state["position"][0] = 0
-        elif self.state["motion"][1] > screenHeight - (self.state["position"][1] + self.H):
+        elif self.state["motion"][1] > screenHeight - (
+            self.state["position"][1] + self.H
+        ):
             self.state["motion"][1] = (-self.state["motion"][1]) * (
                 config.ela["bottom"] / 100
             )
@@ -322,12 +342,13 @@ class Window(QtWidgets.QWidget):
         # Right-click menu
         menuDict = {
             tran.run("program.menu.exit"): {
-                "__type__": "command",
-                "__func__": self.close,
+                "_type": "$",
+                "_func": self.close,
             },
+            "-1": {"_type": "-"},
             eval(tran.run("program.menu.about.title")): {
-                "__type__": "command",
-                "__func__": lambda: QtWidgets.QMessageBox.about(
+                "_type": "$",
+                "_func": lambda: QtWidgets.QMessageBox.about(
                     self,
                     eval(tran.run("program.menu.about.title")),
                     eval(tran.run("program.menu.about.text")),
@@ -338,55 +359,27 @@ class Window(QtWidgets.QWidget):
 
         # 导入插件
         for plugin in pluginList:
-            menuDict[plugin.pluginName] = {"__type__": "menu"}
-            for displayName, entry in plugin.menu.items():
-
-                def itemFunc(f=entry):
-                    def _():
-                        try:
-                            getattr(f, setting.pluginObjectEntry)(
-                                self.image,
-                                self.mainTimer,
-                                self.physicsTimer,
-                                self.state,
-                                self,
-                            )
-                        except Exception as error:  # noqa: F841
-                            createLog(
-                                eval(tran.run("program.plugin.function.runError")),
-                                3,
-                                debug=setting.debug,
-                            )
-
-                    return _
-
-                menuDict[plugin.pluginName][displayName] = {
-                    "__type__": "command",
-                    "__func__": itemFunc(),
-                }
-                createLog(
-                    eval(tran.run("program.plugin.function.add")),
-                    debug=setting.debug,
-                )
+            menuDict[plugin.pluginName] = plugin.menu
 
         if setting.debug:
+            menuDict["-2"] = {"_type": "-"}
             if self.showBox:
                 menuDict[tran.run("program.menu.collisionBox")] = {
-                    "__type__": "command",
-                    "__func__": lambda: self.desktopPet.setStyleSheet(""),
+                    "_type": "$",
+                    "_func": lambda: self.desktopPet.setStyleSheet(""),
                 }
                 self.showBox = False
             else:
                 menuDict[tran.run("program.menu.collisionBox")] = {
-                    "__type__": "command",
-                    "__func__": lambda: self.desktopPet.setStyleSheet(
+                    "_type": "$",
+                    "_func": lambda: self.desktopPet.setStyleSheet(
                         "border: 1px solid red;"
                     ),
                 }
                 self.showBox = True
             menuDict[tran.run("program.menu.outputParameter")] = {
-                "__type__": "command",
-                "__func__": lambda: createLog(
+                "_type": "$",
+                "_func": lambda: createLog(
                     "\n" + pprint.pformat(globals(), 2, sort_dicts=False),
                     debug=setting.debug,
                 ),

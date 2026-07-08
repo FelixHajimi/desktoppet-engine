@@ -11,5 +11,5 @@
     "right": 10,
     "bottom": 30
   },
-  "plugin": ["message"]
+  "plugin": []
 }

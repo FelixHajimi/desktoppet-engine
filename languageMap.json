@@ -90,13 +90,13 @@
     "fr-fr": "Menu contextuel de base créé"
   },
   "program.plugin.function.runError": {
-    "zh-cn": "f\"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(f, 'create')} 功能错误:{error}\"",
-    "zh-tw": "f\"桌寵 {plugin.pluginName} 外掛 {displayName}:{getattr(f, 'create')} 功能異常:{error}\"",
-    "en-us": "f\"Desktop pet {plugin.pluginName} plugin's {displayName}:{getattr(f, 'create')} function error:{error}\"",
-    "ja-jp": "f\"ペットプラグイン {plugin.pluginName} {displayName}:{getattr(f, 'create')} 機能エラー:{error}\"",
-    "ko-kr": "f\"펫 플러그인 {plugin.pluginName} {displayName}:{getattr(f, 'create')} 기능 오류:{error}\"",
-    "ru-ru": "f\"Ошибка функции {displayName}:{getattr(f, 'create')} плагина {plugin.pluginName}:{error}\"",
-    "fr-fr": "f\"Erreur fonction {displayName}:{getattr(f, 'create')} plugin {plugin.pluginName} :{error}\""
+    "zh-cn": "f\"桌宠 {plugin.pluginName} 插件的 {displayName}:{getattr(func, setting.pluginObjectEnter)} 功能错误:{error}\"",
+    "zh-tw": "f\"桌寵 {plugin.pluginName} 外掛 {displayName}:{getattr(func, setting.pluginObjectEnter)} 功能異常:{error}\"",
+    "en-us": "f\"Desktop pet {plugin.pluginName} plugin's {displayName}:{getattr(func, setting.pluginObjectEnter)} function error:{error}\"",
+    "ja-jp": "f\"ペットプラグイン {plugin.pluginName} {displayName}:{getattr(func, setting.pluginObjectEnter)} 機能エラー:{error}\"",
+    "ko-kr": "f\"펫 플러그인 {plugin.pluginName} {displayName}:{getattr(func, setting.pluginObjectEnter)} 기능 오류:{error}\"",
+    "ru-ru": "f\"Ошибка функции {displayName}:{getattr(func, setting.pluginObjectEnter)} плагина {plugin.pluginName}:{error}\"",
+    "fr-fr": "f\"Erreur fonction {displayName}:{getattr(func, setting.pluginObjectEnter)} plugin {plugin.pluginName} :{error}\""
   },
   "program.plugin.function.add": {
     "zh-cn": "f\"桌宠 {plugin.pluginName} 插件的 {displayName} 功能已添加\"",
