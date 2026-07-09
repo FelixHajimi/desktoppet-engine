@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Test</title>
+    <title>桌宠启动器 - 主页</title>
     <style>
       * {
         margin: 0;
@@ -67,20 +67,72 @@
       #information_area {
         flex: 6;
       }
+
+      #message {
+        display: flex;
+        flex-direction: column-reverse;
+        position: fixed;
+        width: 20%;
+        height: 100%;
+        right: 0;
+        padding: 5px;
+      }
+
+      .information p,
+      .warning p,
+      .error p {
+        transition: 1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px;
+        width: 100%;
+        border-radius: 10px;
+        color: white;
+        font-weight: bold;
+      }
+
+      .information p {
+        background-color: rgb(68, 171, 255);
+      }
+
+      .warning p {
+        background-color: rgb(255, 217, 0);
+      }
+
+      .error p {
+        background-color: rgb(255, 43, 43);
+      }
+
+      .information p[drop],
+      .warning p[drop],
+      .error p[drop] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background-color: white;
+        border-radius: 10px;
+        font-weight: bolder;
+      }
     </style>
   </head>
   <body>
     <div id="control_area">
       <div>
         <img alt="Icon" id="icon" />
-        <p id="pet_name" style="font-size: 24px">(桌宠名称)</p>
-        <p id="pet_verstion" style="font-size: 18px">(桌宠版本)</p>
-        <p id="pet_author" style="font-size: 18px">(桌宠作者)</p>
+        <p id="pet_name" style="font-size: 24px; font-weight: bold">
+          (桌宠名称)
+        </p>
+        <p id="pet_verstion" style="font-size: 16px">(桌宠版本)</p>
+        <p id="pet_author" style="font-size: 16px">(桌宠作者)</p>
       </div>
       <button id="start_button">启动</button>
-      <button>选择桌宠实例</button>
+      <button id="choose_desktoppet">选择桌宠实例</button>
     </div>
     <div id="information_area"></div>
+
+    <div id="message"></div>
     <script src="./main.js"></script>
   </body>
 </html>
