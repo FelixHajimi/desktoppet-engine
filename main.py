@@ -2,6 +2,7 @@ import json
 import logging
 import pprint
 import sys
+import os
 from dataclasses import dataclass, field
 from importlib import util
 
@@ -399,9 +400,10 @@ class Window(QtWidgets.QWidget):
         )
 
 
+PATH = os.path.dirname(__file__)
 # 导入数据
 # Import Data
-setting = Setting(**json.load(open("./setting.json", encoding="utf-8")))
+setting = Setting(**json.load(open(f"{PATH}/setting.json", encoding="utf-8")))
 config = DesktopPetConfig(
     **json.load(
         open(f"{setting.dataDir}/{setting.desktopPet}/config.json", encoding="utf-8")
@@ -418,7 +420,7 @@ logging.basicConfig(
 )
 
 tran = Translate(
-    json.load(open("./languageMap.json", encoding="utf-8")), setting.language
+    json.load(open(f"{PATH}/languageMap.json", encoding="utf-8")), setting.language
 )
 
 pluginList = []
