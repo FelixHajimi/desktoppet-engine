@@ -2,7 +2,7 @@
   "desktopPet": "Example",
   "debug": false,
   "language": "zh-cn",
-  "dataDir": "data",
+  "dataDir": "./data",
   "desktoppetResourceDir": "res",
   "pluginFileName": "enter",
   "pluginObjectEnter": "enter",
