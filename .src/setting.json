@@ -1,6 +1,6 @@
 {
   "desktopPet": "Example",
-  "debug": true,
+  "debug": false,
   "language": "zh-cn",
   "dataDir": "./data",
   "desktoppetResourceDir": "res",
