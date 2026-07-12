@@ -10,7 +10,7 @@ The startup configuration is stored in the `setting.json` file in the root direc
   "dataDir": "data",
   "desktoppetResourceDir": "res",
   "pluginFileName": "enter",
-  "pluginObjectEntry": "enter",
+  "pluginObjectEnter": "enter",
   "logPath": "./last.log",
   "imageSize": [128, 128]
 }
@@ -30,10 +30,10 @@ The program will look for the corresponding pet folder in the directory specifie
 
 Global debug mode toggle.
 
-| Value | Description |
-|------|------|
-| `true` | Enable debug mode, output detailed logs, show collision boxes |
-| `false` | Disable debug mode, only output necessary information |
+| Value   | Description                                                   |
+| ------- | ------------------------------------------------------------- |
+| `true`  | Enable debug mode, output detailed logs, show collision boxes |
+| `false` | Disable debug mode, only output necessary information         |
 
 When enabled, the right-click menu will display additional options like "Collision Box" and "Output Parameters" for development and debugging purposes.
 
@@ -45,15 +45,15 @@ The interface language used by the program. This affects log output, right-click
 
 Currently supported languages:
 
-| Language | Code |
-| --- | --- |
+| Language                 | Code    |
+| ------------------------ | ------- |
 | Chinese (Mainland China) | `zh-cn` |
-| Chinese (Taiwan Region) | `zh-tw` |
-| English (United States) | `en-us` |
-| Japanese (Japan) | `ja-jp` |
-| Korean (South Korea) | `ko-kr` |
-| Russian (Russia) | `ru-ru` |
-| French (France) | `fr-fr` |
+| Chinese (Taiwan Region)  | `zh-tw` |
+| English (United States)  | `en-us` |
+| Japanese (Japan)         | `ja-jp` |
+| Korean (South Korea)     | `ko-kr` |
+| Russian (Russia)         | `ru-ru` |
+| French (France)          | `fr-fr` |
 
 ---
 
@@ -81,11 +81,11 @@ The program will load `[pet_directory]/plugin/[plugin_name]/[plugin_filename].py
 
 ---
 
-### `pluginObjectEntry`
+### `pluginObjectEnter`
 
 The plugin entry object name.
 
-The program will call the method named `[plugin_entry_object]` in the plugin.
+The program will call the method named `[plugin_enter_object]` in the plugin.
 
 ---
 

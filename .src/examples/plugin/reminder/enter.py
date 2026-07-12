@@ -3,20 +3,20 @@ import random
 
 class Template:
     def __init__(self):
-        self.__autoStart__ = False
+        self._autoStart = False
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
-        self.__image__ = image
-        self.__mainTimer__ = mainTimer
-        self.__physicsTimer__ = physicsTimer
-        self.__state__ = state
-        self.__window__ = window
+        self._image = image
+        self._mainTimer = mainTimer
+        self._physicsTimer = physicsTimer
+        self._state = state
+        self._window = window
 
 
 class Reminder(Template):
     def __init__(self):
         super().__init__()
-        self.__autoStart__ = True
+        self._autoStart = True
 
     def enter(self, image, mainTimer, physicsTimer, state, window):
         super().enter(image, mainTimer, physicsTimer, state, window)
@@ -24,13 +24,13 @@ class Reminder(Template):
         
         timer = QtCore.QTimer()
         timer.timeout.connect(self.show_reminder)
-        timer.start(30000)
-        self.__state__["reminder_timer"] = timer
+        timer.start(2160000)
+        self._state["reminder_timer"] = timer
 
     def show_reminder(self):
         messages = ["该休息一下了！", "起来走动走动！", "喝口水吧！"]
         QtWidgets.QMessageBox.information(
-            self.__window__, 
+            self._window, 
             "提醒", 
             random.choice(messages)
         )
