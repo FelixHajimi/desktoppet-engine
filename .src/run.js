@@ -43,7 +43,7 @@ function createLog(level, message) {
   let launcher_log = path.join(__dirname, "launcher-log.log");
   fs.appendFile(
     launcher_log,
-    `[${level}] (${new Date().toLocaleString()}) - ${message}`,
+    `[${level}] (${new Date().toLocaleString()}) - ${message}\n`,
     (err) => {
       if (err) {
         console.error("写入日志失败: ", err);
@@ -64,7 +64,7 @@ ipcMain.on("exec", (event, args) => {
 });
 
 ipcMain.on("change_page", (event, args) => {
-  if (["main", "desktoppet_config"].includes(args[0]) && win) {
+  if (["main"].includes(args[0]) && win) {
     win.loadFile(path.join(__dirname, `${args[0]}.html`));
   }
 });
