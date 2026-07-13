@@ -96,7 +96,6 @@ async function main() {
 
   const desktoppet_config = document.getElementById("desktoppet_config");
   desktoppet_config.addEventListener("click", (event) => {
-    // ipcRenderer.send("change_page", ["desktoppet_config"]);
     ipcRenderer.send("exec", [
       `start ${path.join(__dirname, `${setting.dataDir}/${setting.desktopPet}/config.json`)}`,
     ]);
