@@ -18,24 +18,18 @@ def menuGenerate(master: QtWidgets.QWidget, structure: dict):
         mainMenu: QtWidgets.QMenu, structure: dict, master: QtWidgets.QWidget = master
     ):
         for key in structure.keys():
-            if key in ["_type", "_func", "_enter"]:
+            if key in ["_type", "_func", "_activate"]:
                 continue
             elif structure[key]["_type"] == "$":
                 command = QtGui.QAction(key, mainMenu)
                 if "_func" in structure[key]:
                     command.triggered.connect(structure[key]["_func"])
-                elif "_enter" in structure[key]:
+                elif "_activate" in structure[key]:
 
-                    def itemFunc(func=structure[key]["_enter"]):
+                    def itemFunc(func=structure[key]["_activate"]):
                         def insideFunc():
                             try:
-                                getattr(func, setting.pluginObjectEnter)(
-                                    master.image,
-                                    master.mainTimer,
-                                    master.physicsTimer,
-                                    master.state,
-                                    master,
-                                )
+                                getattr(func, "activate")(master.state)
                             except Exception as error:  # noqa: F841
                                 displayName = key
                                 createLog(
@@ -105,11 +99,8 @@ class Translate:
 class Setting:
     desktopPet: str
     dataDir: str
-    desktoppetResourceDir: str
-    pluginFileName: str
-    pluginObjectEnter: str
     imageSize: list[int]
-    language: str = "en-us"
+    language: str
     debug: bool = False
     logPath: str = "./last.log"
 
@@ -132,9 +123,7 @@ class Window(QtWidgets.QWidget):
         super().__init__()
         self.setWindowTitle(config.name)
         self.setWindowIcon(
-            QtGui.QIcon(
-                f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/icon.gif"
-            )
+            QtGui.QIcon(f"{setting.dataDir}/{setting.desktopPet}/res/icon.gif")
         )
         self.setWindowFlags(
             QtCore.Qt.WindowType.WindowStaysOnTopHint
@@ -143,10 +132,10 @@ class Window(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         createLog(tran.run("window.complete"), debug=setting.debug)
 
-        self.W, self.H = setting.imageSize
+        self.WIDTH, self.HEIGHT = setting.imageSize
         self.nowMousePos = [0, 0]
         self.lastMousePos = [0, 0]
-        self.position = [(screenWidth - self.W) // 2, screenHeight - self.H]
+        self.position = [(screenWidth - self.WIDTH) // 2, screenHeight - self.HEIGHT]
         self.motion = [0, 0]
         self.pause = False
         self.showBox = False
@@ -166,9 +155,9 @@ class Window(QtWidgets.QWidget):
         self.desktopPet.mouseMoveEvent = self.MouseMoveEvent
         self.desktopPet.mouseReleaseEvent = self.MouseReleaseEvent
         self.image = QtGui.QMovie()
-        self.image.setScaledSize(QtCore.QSize(self.W, self.H))
+        self.image.setScaledSize(QtCore.QSize(self.WIDTH, self.HEIGHT))
         self.desktopPet.setMovie(self.image)
-        self.desktopPet.resize(self.W, self.H)
+        self.desktopPet.resize(self.WIDTH, self.HEIGHT)
 
         self.state = {
             "pause": False,
@@ -180,27 +169,41 @@ class Window(QtWidgets.QWidget):
         }
         createLog(tran.run("program.ready"), debug=setting.debug)
 
-        # 自启动判断
-        # Autostart judgment
-        def autostart(structure: dict):
+        # 插件初始化
+        # Plugin init
+        def plugin_init(structure: dict):
             for key in structure.keys():
-                if key in ["_type", "_func", "_enter"]:
+                if key in ["_type", "_func", "_activate"]:
                     continue
                 elif structure[key]["_type"] == "$":
-                    if "_enter" in structure[key]:
-                        if getattr(structure[key]["_enter"], "_autoStart"):
-                            getattr(structure[key]["_enter"], "enter")(
-                                self.image,
-                                self.mainTimer,
-                                self.physicsTimer,
+                    if "_activate" in structure[key]:
+                        getattr(structure[key]["_activate"], "init")(
+                            self.image, self.mainTimer, self.physicsTimer, self
+                        )
+                        if getattr(structure[key]["_activate"], "_autoStart"):
+                            getattr(structure[key]["_activate"], "activate")(
                                 self.state,
-                                self,
                             )
                 elif structure[key]["_type"] == "/":
-                    autostart(structure[key])
+                    plugin_init(structure[key])
 
         for plugin in pluginList:
-            autostart(plugin.menu)
+            plugin_init(plugin.menu)
+
+    def deactivate(self):
+        def plugin_deactivate(structure: dict):
+            for key in structure.keys():
+                if key in ["_type", "_func", "_activate"]:
+                    continue
+                elif structure[key]["_type"] == "$":
+                    if "_activate" in structure[key]:
+                        getattr(structure[key]["_activate"], "deactivate")()
+                elif structure[key]["_type"] == "/":
+                    plugin_deactivate(structure[key])
+
+        for plugin in pluginList:
+            plugin_deactivate(plugin.menu)
+        self.close()
 
     def loadMovie(self, path: str):
         # 加载动画
@@ -221,13 +224,9 @@ class Window(QtWidgets.QWidget):
                 abs(self.state["motion"][0]) <= config.acc[0]
                 and abs(self.state["motion"][1]) <= config.acc[1]
             ):
-                self.loadMovie(
-                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/stand.gif"
-                )
+                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/res/stand.gif")
             else:
-                self.loadMovie(
-                    f"{setting.dataDir}/{setting.desktopPet}/{setting.desktoppetResourceDir}/drop.gif"
-                )
+                self.loadMovie(f"{setting.dataDir}/{setting.desktopPet}/res/drop.gif")
 
         for func in self.state["update"].values():
             try:
@@ -254,23 +253,25 @@ class Window(QtWidgets.QWidget):
 
         # 速度预处理
         # Speed preprocessing
-        if self.state["motion"][0] > screenWidth - (self.state["position"][0] + self.W):
+        if self.state["motion"][0] > screenWidth - (
+            self.state["position"][0] + self.WIDTH
+        ):
             self.state["motion"][0] = (-self.state["motion"][0]) * (
                 config.ela["right"] / 100
             )
-            self.state["position"][0] = screenWidth - self.W
+            self.state["position"][0] = screenWidth - self.WIDTH
         elif -self.state["motion"][0] > self.state["position"][0]:
             self.state["motion"][0] = (-self.state["motion"][0]) * (
                 config.ela["left"] / 100
             )
             self.state["position"][0] = 0
         elif self.state["motion"][1] > screenHeight - (
-            self.state["position"][1] + self.H
+            self.state["position"][1] + self.HEIGHT
         ):
             self.state["motion"][1] = (-self.state["motion"][1]) * (
                 config.ela["bottom"] / 100
             )
-            self.state["position"][1] = screenHeight - self.H
+            self.state["position"][1] = screenHeight - self.HEIGHT
         elif -self.state["motion"][1] > self.state["position"][1]:
             self.state["motion"][1] = (-self.state["motion"][1]) * (
                 config.ela["top"] / 100
@@ -284,7 +285,7 @@ class Window(QtWidgets.QWidget):
                 self.motion[1] = 0
             else:
                 self.motion[1] += config.fri["left"] * ((-1) ** (self.motion[1] > 0))
-        elif self.state["position"][0] == screenWidth - self.W:
+        elif self.state["position"][0] == screenWidth - self.WIDTH:
             if abs(self.motion[1]) < config.fri["right"]:
                 self.motion[1] = 0
             else:
@@ -294,7 +295,7 @@ class Window(QtWidgets.QWidget):
                 self.motion[0] = 0
             else:
                 self.motion[0] += config.fri["top"] * ((-1) ** (self.motion[0] > 0))
-        elif self.state["position"][1] == screenHeight - self.H:
+        elif self.state["position"][1] == screenHeight - self.HEIGHT:
             if abs(self.motion[0]) < config.fri["bottom"]:
                 self.motion[0] = 0
             else:
@@ -344,7 +345,7 @@ class Window(QtWidgets.QWidget):
         menuDict = {
             tran.run("program.menu.exit"): {
                 "_type": "$",
-                "_func": self.close,
+                "_func": self.deactivate,
             },
             "-1": {"_type": "-"},
             eval(tran.run("program.menu.about.title")): {
@@ -420,7 +421,7 @@ pluginList = []
 for path in config.plugin:
     spec = util.spec_from_file_location(
         "plugin",
-        f"{setting.dataDir}/{setting.desktopPet}/plugin/{path}/{setting.pluginFileName}.py",
+        f"{setting.dataDir}/{setting.desktopPet}/plugin/{path}/enter.py",
     )
     if spec and spec.loader:
         plugin = util.module_from_spec(spec)
