@@ -25,7 +25,6 @@ class Template:
 
 
 class Information(Template):
-
     def activate(self, state):
         super().activate(state)
         QtWidgets.QMessageBox.information(self._window, "消息", "消息正文")
