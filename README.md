@@ -1,125 +1,158 @@
-# DesktopPet-Engine
-[![GitHub Repo stars](https://img.shields.io/github/stars/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
-[![GitHub forks](https://img.shields.io/github/forks/FelixHajimi/desktoppet-engine?style=social)](https://github.com/FelixHajimi/desktoppet-engine)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-A lightweight desktop pet loading engine that supports physics simulation, plugin extensions, internationalization, and logging. It brings any character to life on your desktop.
+## DesktopPet-Engine
 
-<!--## Demo Video
-> Using a  as material for demonstration
+[![GitHub Repo stars](https://img.shields.io/github/stars/FelixHajimi/desktoppet-engine?style=social)](https://github.com/desktoppet-engine/desktoppet-engine)
+[![GitHub forks](https://img.shields.io/github/forks/FelixHajimi/desktoppet-engine?style=social)](https://github.com/desktoppet-engine/desktoppet-engine)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-| Interactive Effects | Right-Click Menu | Office Assistance |
-| --- | --- | --- |
-| Interactive Effects | Right-Click Menu | Office Assistance |-->
-<!--Materials are currently being solicited, artists are welcome to contribute! 🙇-->
+A lightweight desktop pet engine that supports physics simulation, plugin extensions, internationalization, and logging. Bring any character to life on your desktop.
+
+---
 
 ## What It Can Do
+
 ### For Users
-- Desktop Pet: A cute little companion on your desktop that falls with gravity, bounces, and has physical collision
-- Drag Interaction: Click and hold the left button to drag it up and throw it out – it will bounce physically
-- Multi-State Animation: Standing, falling, being dragged – each state automatically switches to the corresponding animation
-- Plugin Extension: Supports loading plugins to enable more features (e.g., timed reminders, weather display, etc.)
-- Multi-Language: Built-in Chinese and English switching, configurable as needed
-- Always on Top: Stays on the topmost layer of the desktop, never blocked by other windows
+
+- **Desktop Pet**: A cute little companion that falls with gravity, bounces, and responds to physics collisions
+- **Drag & Drop Interaction**: Drag it up with left mouse button and throw it — it will bounce physically
+- **Multi-State Animation**: Standing, falling, being dragged — each state automatically switches to the corresponding animation
+- **Plugin Extensions**: Load plugins to add more features (e.g., timed reminders, weather display, etc.)
+- **Multi-Language**: Built-in multi-language support, configurable as needed
+- **Always on Top**: Stays on top of all other windows
+
 ### For Developers
-- Character Pack Ready to Use: Just prepare image assets and a config.json file – no coding required
-- Freely Adjustable Physics Parameters: Gravity, bounce coefficient, friction – all customizable
-- Plugin System: Supports Python plugins for extending any interactive logic
-- Debug Mode: Displays collision boxes, outputs runtime parameters for easy tuning
+
+- **Ready-to-Use Character Packs**: Just prepare image assets and a `config.json` file, no coding required
+- **Customizable Physics Parameters**: Gravity, elasticity, friction — all adjustable
+- **Plugin System**: Python plugin support for extending any interaction logic
+- **Debug Mode**: Shows collision boxes and outputs runtime parameters for easy tuning
+
+---
 
 ## Project Structure
+
 ```text
 ├─ data/                      Root directory for all desktop pets
-│  └─ pet_name/               Individual pet folder
+│  └─ [pet_name]/             Individual pet directory
 │     ├─ config.json          Pet configuration
 │     ├─ plugin/              Pet plugins
-│     │  └─ [plugin_name]/    Individual plugin folder
+│     │  └─ [plugin_name]/    Individual plugin directory
 │     │     └─ enter.py       Plugin entry point
 │     └─ res/                 Pet resource files
-│        ├─ drop.gif          Falling
-│        ├─ icon.gif          Icon
-│        └─ stand.gif         Standing
-├─ languageMap.py             Internationalization language map
+│        ├─ drop.gif          Falling animation
+│        ├─ icon.gif          Window icon
+│        └─ stand.gif         Standing animation
+├─ docs/                      Documentation directory
+│  ├─ 中文/
+│  │  ├─ 启动配置.md
+│  │  ├─ 桌宠配置.md
+│  │  ├─ 角色包制作.md
+│  │  ├─ 插件开发.md
+│  │  └─ 常见问题.md
+│  └─ English/
+│     ├─ StartupConfiguration.md
+│     ├─ PetConfiguration.md
+│     ├─ PetPackageCreation.md
+│     ├─ Plugin.md
+│     └─ FrequentlyAskedQuestions.md
+├─ languageMap.json           Internationalization language map
 ├─ main.py                    Main program
-└─ setting.json               Startup settings
+├─ setting.json               Launch configuration
+└─ last.log                   Runtime log
 ```
 
-## How to Get Started
-> Regular users can directly download the packaged program and use it
-### Testing
-You need a Python environment with PySide6 installed to run it.
+---
 
-Run `python main.py` in the terminal – if successful, the assets in the res folder will be displayed.
+## Getting Started
 
-### Pet Configuration
+### Running the Program
+
+**Option 1: Using the Packaged Executable**
+
+Regular users can download the pre-packaged executable, extract it, and double-click to run.
+
+**Option 2: Running from Source**
+
+You need a Python environment with PySide6 installed:
+
+```bash
+pip install PySide6
+python main.py
+```
+
+If successful, the pet assets in `res/` will be displayed.
+
+### Basic Configuration
+
+#### Launch Configuration (`setting.json`)
+
 ```json
 {
-  "name": "",
-  "version": "",
-  "author": "",
-  "acc": [...],
-  "fri": {...},
-  "ela": {...},
-  "plugin": [...]
+  "desktopPet": "Example",
+  "dataDir": "data",
+  "imageSize": [128, 128],
+  "language": "en-us",
+  "logPath": "./last.log",
+  "logLevel": 0
 }
 ```
-| Key | Description | Recommended Value |
-| --- | --- | --- |
-| name | Pet name | |
-| version | Version number | |
-| author | Author | |
-| acc | Gravity acceleration | [0, 0.8~2] |
-| fri | Friction | t\|b=1~5 l\|r=0 |
-| ela | Bounce coefficient | b=5 l\|r=10 |
-| plugin | List of plugins to load | |
 
-See `docs/English/pet_config.md` for details.
-
-### Startup Settings
-```json
-{
-    "desktopPet": "Example",
-    "debug": true,
-    "language": "en-us"
-}
-```
 | Key | Description |
-| --- | --- |
-| desktopPet | The pet to load when the program starts |
-| debug | Debug mode status |
-| language | Language to be used by the program |
+|---|---|
+| `desktopPet` | Name of the pet to load on startup |
+| `dataDir` | Data directory for pets |
+| `imageSize` | Display size of the pet |
+| `language` | Interface language |
+| `logPath` | Log file path |
+| `logLevel` | Log output level |
 
-See `docs/English/startup_settings.md` for details.
+See [`docs/English/StartupConfiguration.md`](./docs/English/StartupConfiguration.md) for details.
 
-## Frequently Asked Questions
-Q: Why does it fail to start and show an error?  
-A: It might be a configuration issue. Please submit an issue or check the relevant solutions.
+#### Pet Configuration (`data/[pet_name]/config.json`)
 
-Q: Why is my pet stuck at the edge of the screen?  
-A: Check the `fri` setting of your pet. If it is greater than `acc`, adjust it to a normal value.
+```json
+{
+  "name": "Example",
+  "version": "1.0.0",
+  "author": "YourName",
+  "acc": [0, 1.2],
+  "fri": {
+    "top": 2,
+    "bottom": 3,
+    "left": 0,
+    "right": 0
+  },
+  "ela": {
+    "top": 0,
+    "bottom": 5,
+    "left": 10,
+    "right": 10
+  },
+  "plugin": []
+}
+```
 
-Q: Can I run multiple pets at the same time?  
-A: Currently only single instance is supported. Multi-instance support is under development.
+| Key | Description | Recommended Value |
+|---|---|---|
+| `name` | Pet name | - |
+| `version` | Version number | - |
+| `author` | Author | - |
+| `acc` | Gravity acceleration | `[0, 0.8~2]` |
+| `fri` | Friction | `top/bottom=1~5`, `left/right=0` |
+| `ela` | Elasticity | `bottom=5`, `left/right=10` |
+| `plugin` | Plugin list to load | `[]` |
 
-Q: How do I switch languages?  
-A: Change the `language` in `setting.json` to `zh-cn` (Chinese) or `en-us` (English).
+See [`docs/English/PetConfiguration.md`](./docs/English/PetConfiguration.md) for details.
 
-Q: What if a plugin fails to load?  
-A: Check that the `plugin` list in `config.json` matches the folder names under `/data/pet_name/plugin/`, and ensure `enter.py` exists with correct syntax. Error logs will be written to `/last.log`.
+---
 
-Q: I want to create my own character pack – do I need to know programming?  
-A: Generally no. A **basic** character only needs art assets – no programming skills required.
+## Documentation
 
-Q: How do I report a Bug?  
-A: Please describe the issue and attach the `./last.log` log file when submitting an issue.
+For full documentation, please refer to the `docs/` directory:
 
-## Community Group
-QQ Group: 109956850  
-Please check the group announcement upon joining.
-
-## Contributing
-If you have suggestions or feedback for this project, please submit your ideas or improvement points via issue.
-
-We are currently soliciting character assets! If you are good at pixel art / chibi-style characters, welcome to join the QQ group or submit an Issue!
-
-## Related Documentation
-Please refer to `/docs/English/*`
+| Document |
+|---|
+| [`docs/English/StartupConfiguration.md`](./docs/English/StartupConfiguration.md) |
+| [`docs/English/PetConfiguration.md`](./docs/English/PetConfiguration.md) |
+| [`docs/English/PetPackageCreation.md`](./docs/English/PetPackageCreation.md) |
+| [`docs/English/Plugin.md`](./docs/English/Plugin.md) |
+| [`docs/English/FrequentlyAskedQuestions.md`](./docs/English/FrequentlyAskedQuestions.md) |
