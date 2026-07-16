@@ -33,9 +33,6 @@
   "debug": false,
   "language": "en-us",
   "dataDir": "data",
-  "desktoppetResourceDir": "res",
-  "pluginFileName": "enter",
-  "pluginObjectEnter": "enter",
   "logPath": "./last.log",
   "imageSize": [128, 128]
 }

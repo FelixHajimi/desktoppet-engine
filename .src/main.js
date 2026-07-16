@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-const path = require("path")
+const path = require("path");
 
 async function loadSetting() {
   const setting_loader = await fetch("setting.json");
@@ -76,7 +76,7 @@ async function main() {
   const config = await loadConfig(setting);
 
   const icon = document.getElementById("icon");
-  icon.src = `${setting.dataDir}/${setting.desktopPet}/${setting.desktoppetResourceDir}/icon.gif`;
+  icon.src = `${setting.dataDir}/${setting.desktopPet}/res/icon.gif`;
 
   const pet_name = document.getElementById("pet_name");
   pet_name.innerText = config.name;

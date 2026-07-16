@@ -1,11 +1,8 @@
 {
   "desktopPet": "Example",
-  "debug": false,
   "language": "zh-cn",
   "dataDir": "./data",
-  "desktoppetResourceDir": "res",
-  "pluginFileName": "enter",
-  "pluginObjectEnter": "enter",
   "logPath": "./last.log",
+  "logLevel": 0,
   "imageSize": [128, 128]
 }
